@@ -48,6 +48,15 @@ public:
 	// Compare with another string object
 	bool compare(const String& other) const;
 
+	// Compare with another char array
+	bool compare(const char* c_str_2) const;
+
+	// Function to check whether a char is a letter or not
+	bool isLetter(char x);
+
+	// Convert all alphabets to lowercase
+	void to_lower();
+
 	// Destructor
 	~String();
 
@@ -59,9 +68,14 @@ public:
 		len = 0;
 	}
 
+	friend std::istream& operator>>(std::istream& is, String& str);
+	friend std::ostream& operator<<(std::ostream& os, const String& str);
+
 private:
 	// Helper functions
 	int strlen(const char* c_str) const;
 	void strcpy(char* dest, const char* src) const;
 	bool strcmp(const char* c_str_1, const char* c_str_2) const;
 };
+std::istream& operator>>(std::istream& is, String& str);
+std::ostream& operator<<(std::ostream& os, const String& str);

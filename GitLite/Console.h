@@ -19,42 +19,36 @@ public:
 	{
 		while (true)
 		{
-			cout << '>';  // Ready for user input
-			cin >> command;
-			command = tolower(command);
-			command.
-			if (command != "init");
-			cin >> second;
-
 			// The user can either input a single word command (init)
 			// Or a command that has an additional part seperated by a space (commit "message")
 			// The additional part can be enclosed in quotes or angle brackets
-			// Spliting these two into seperate strings
-			//cout << userInput;
+			// The command and second strings allow us to split these into two
+			// Further allowing us to use them where needed
 
-			//bool part = 0;  // First message
-			//for (int i = 0; i < userInput.size() - 1; ++i)  // Looping up till size - 1 to exclude the bracket or quote
-			//{
-			//	if (userInput[i] == ' ')
-			//		part = 1; // second message started
-			//	if (part == 0)
-			//	{
-			//		command += userInput[i];
-			//	}
-			//	else
-			//	{
-			//		second += userInput[i];
-			//	}
-			//}
+			cout << '>';  // Ready for user input
+			cin >> command;
+			command.to_lower();  // Convert to lowercase to make everything consistent
+			// For all commands that only have one part
+			if (!(command.compare("log") || command.compare("branches") || command.compare("current-branch") || command.compare("save")))
+			{
+				cin >> second;
+				String temp;
+				for (int i = 0; i < second.getlen(); ++i)
+				{
+					char c = second[i];
+					if (c == '<' || c == '>' || c == '"')  // Ignoring enclosing characters
+					{
+						continue;
+					}
+					temp = temp + c;
+				}
+				second = temp;  // Removed enclosing characters
+			}
+			
+			
 
 
 			cout << endl;
-			cout << command << ' ' << second;
-
-			if (command == "init")
-			{
-				cout << "Init command called";
-			}
 		}
 	}
 };

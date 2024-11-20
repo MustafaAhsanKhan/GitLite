@@ -1,5 +1,4 @@
 #include "String.h"
-
 //////////////////////////////////
 // CUSTOM STRING DATATYPE CLASS //
 //////////////////////////////////
@@ -214,6 +213,38 @@ bool String::compare(const String& other) const
 	return strcmp(data, other.data);
 }
 
+// Compare with another char array
+bool String::compare(const char* c_str_2) const
+{
+	if (len != strlen(c_str_2))
+	{
+		return false;
+	}
+	return strcmp(data, c_str_2);
+}
+
+// Function to check whether a char is a letter or not
+bool String::isLetter(char x)
+{
+	return ((x >= 'A' && x <= 'Z') || (x >= 'a' && x <= 'z'));
+}
+
+// Convert all alphabets to lowercase
+void String::to_lower()
+{
+	if (data)
+	{
+		for (int i = 0; i < len; ++i)
+		{
+			if (data[i] >= 'A' && data[i] <= 'Z') // Check if the character is uppercase
+			{
+				data[i] += ('a' - 'A'); // Convert to lowercase
+			}
+		}
+	}
+}
+
+
 // Destructor
 String::~String()
 {
@@ -262,4 +293,24 @@ bool String::strcmp(const char* c_str_1, const char* c_str_2) const
 	{
 		return 0;
 	}
+}
+
+std::istream& operator>>(std::istream& is, String& str)
+{
+	char buffer[1000]; // Temporary buffer to hold the input
+	is >> buffer;      // Read input from std::cin into buffer
+	str.len = strlen(buffer);  // Calculate length of input
+	delete[] str.data;         // Clear existing memory
+	str.data = new char[str.len + 1];
+	strcpy_s(str.data, str.len + 1, buffer);  // Copy input into str.data using strcpy_s
+	return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const String& str)
+{
+	if (str.data) // Ensure data is not null
+	{
+		os << str.data;
+	}
+	return os;
 }
