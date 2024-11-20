@@ -35,6 +35,58 @@ void Console::run()  // Program Loop
 			second = temp;  // Removed enclosing characters
 		}
 
+		// All inputs
+
+		if (command.compare("init"))
+		{
+			// Create the repo using the filename provided
+			cout << "Which tree would you like to use?" << endl;
+			cout << "1: AVL" << endl;
+			cout << "2: B-Tree" << endl;
+			cout << "3: Red-Black Tree" << endl;
+
+			int x = 0;
+			while (1)
+			{
+				cin >> x;
+				if (x == 1)
+				{
+					cout << "Selected AVL tree.";
+					break;
+				}
+				else if (x == 2)
+				{
+					cout << "Selected B-Tree.";
+					break;
+				}
+				else if (x == 3)
+				{
+					cout << "Selected Red-Black Tree.";
+					break;
+				}
+			}
+		}
+		else if (command.compare("branch"))
+		{
+			// second stores branch name
+			cout  << "Branch " << '\'' << second << '\'' << " created successfully.";
+		}
+		else if (command.compare("checkout"))
+		{
+			// second stores branch name
+			cout << "Switched to branch " << '\'' << second << '\'' << '.';
+		}
+		else if (command.compare("commit"))
+		{
+			// second stores the commit message
+			cout << "Changes committed with message: " << '"' << second << '"' << '.';
+		}
+		else if (command.compare("branches"))
+		{
+			// Display all branches
+			cout << "Temp1" << endl << "Temp2";
+		}
+
 
 
 
