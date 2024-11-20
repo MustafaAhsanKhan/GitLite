@@ -5,9 +5,8 @@ using namespace std;
 class Console
 {
 private:
-	String userInput;
-	String command;
-	String second;
+	String command;  // First Part
+	String second;  // Second Part
 
 public:
 	Console();
