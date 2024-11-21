@@ -2,7 +2,6 @@
 
 Console::Console()
 {
-
 }
 
 void Console::run()  // Program Loop
@@ -51,11 +50,10 @@ void Console::run()  // Program Loop
 		}
 
 		// All inputs
-
 		if (command.compare("init"))
 		{
 			// Create the repo using the filename provided
-			cout << "Which tree would you like to use?" << endl;
+			cout << "\033[33mWhich tree would you like to use?\033[0m" << endl;
 			cout << "1: AVL" << endl;
 			cout << "2: B-Tree" << endl;
 			cout << "3: Red-Black Tree" << endl;
@@ -66,17 +64,17 @@ void Console::run()  // Program Loop
 				cin >> x;
 				if (x == 1)
 				{
-					cout << "Selected AVL tree.";
+					cout << "\033[33mSelected AVL tree.\033[0m";
 					break;
 				}
 				else if (x == 2)
 				{
-					cout << "Selected B-Tree.";
+					cout << "\033[33mSelected B-Tree.\033[0m";
 					break;
 				}
 				else if (x == 3)
 				{
-					cout << "Selected Red-Black Tree.";
+					cout << "\033[33mSelected Red-Black Tree.\033[0m";
 					break;
 				}
 			}
@@ -84,33 +82,34 @@ void Console::run()  // Program Loop
 		else if (command.compare("branch"))
 		{
 			// second stores branch name
-			cout  << "Branch " << '\'' << second << '\'' << " created successfully.";
+			cout << "\033[33mBranch " << '\'' << second << '\'' << " created successfully.\033[0m";
 		}
 		else if (command.compare("checkout"))
 		{
 			// second stores branch name
-			cout << "Switched to branch " << '\'' << second << '\'' << '.';
+			cout << "\033[33mSwitched to branch " << '\'' << second << '\'' << ".\033[0m";
 		}
 		else if (command.compare("commit"))
 		{
-			// second stores the commit message
-			cout << "Changes committed with message: " << '"' << second << '"' << '.';
+			// second stores commit message
+			cout << "\033[33mChanges committed with message: " << '"' << second << '"' << ".\033[0m";
 		}
 		else if (command.compare("branches"))
 		{
-			// Display all branches
-			cout << "Temp1" << endl << "Temp2";
+			// List all branches
+			cout << "\033[33mBranches:\033[0m" << endl << "\033[33mmain\033[0m" << endl << "\033[33mfeature-1\033[0m";
+			cout << "\033[33mTemp1\033[0m" << endl << "\033[33mTemp2\033[0m";
 		}
 		else if (command.compare("delete-branch"))
 		{
 			// second stores branch name
-			cout << "Branch" << '\'' << second << '\'' << " deleted successfully.";
+			cout << "\033[33mBranch " << '\'' << second << '\'' << " deleted successfully.\033[0m";
 		}
 		else if (command.compare("merge"))
 		{
 			// second stores the source branch
 			// third stores the target branch
-			cout << "Merged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.";
+			cout << "\033[33mMerged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.\033[0m";
 		}
 		else if (command.compare("visualize-tree"))
 		{
@@ -121,35 +120,32 @@ void Console::run()  // Program Loop
 		}
 		else if (command.compare("log"))
 		{
-			cout << "Commit History for " << '\'' << "feature-1" << '\'' << ':' << endl;  // Replace with current branch
-			cout << "Commit #3: " << '"' << "Refactored feature implementation" << '"' << '.' << endl;  // Replace with the real message
-			cout << "Commit #2: " << '"' << "Added new feature to branch" << '"' << '.' << endl;
-			cout << "Commit #1: " << '"' << "Initialized branch" << '"' << '.';
+			cout << "\033[33mCommit History for " << '\'' << "feature-1" << '\'' << ":\033[0m" << endl;  // Replace with current branch
+			cout << "\033[33mCommit #3: \"Refactored feature implementation\".\033[0m" << endl;  // Replace with the real message
+			cout << "\033[33mCommit #2: \"Added new feature to branch\".\033[0m" << endl;
+			cout << "\033[33mCommit #1: \"Initialized branch\".\033[0m";
 		}
 		else if (command.compare("current-branch"))
 		{
-			cout << "You are on branch: " << '\'' << "main" << '\'' << '.';  // Replace with current branch
+			cout << "\033[33mYou are on branch: 'main'.\033[0m";  // Replace with current branch
 		}
 		else if (command.compare("save"))
 		{
-			cout << "Repository saved successfully to " << '\'' << "repo_data.txt" << '\'' << '.';  // Replace with the real filename
+			cout << "\033[33mRepository saved successfully to 'repo_data.txt'.\033[0m";  // Replace with the real filename
 		}
 		else if (command.compare("load"))
 		{
-			// second stores file name
-			cout << "Repository loaded successfully from " << '\'' << second << '\'' << '.';
+			cout << "\033[33mRepository loaded successfully from '" << second << "'.\033[0m";
 		}
 		else if (command.compare("exit"))
 		{
-			cout << "Exiting GitLite...";
+			cout << "\033[33mExiting GitLite...\033[0m";
 			break;
 		}
 		else
 		{
-			cout << "Invalid command. Please try again.";
+			cout << "\033[91mInvalid command. Please try again.\033[0m";
 		}
-
-
 
 		cout << endl;
 	}
