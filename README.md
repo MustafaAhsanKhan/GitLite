@@ -57,3 +57,4 @@ Commit #1: "Initial commit".
 Repository saved successfully to 'repo_data.txt'.
 >exit
 Exiting GitLite...
+```
