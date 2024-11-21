@@ -34,6 +34,21 @@ void Console::run()  // Program Loop
 			}
 			second = temp;  // Removed enclosing characters
 		}
+		if (command.compare("merge"))  // This command needs two further inputs  // So taking the third input from the user
+		{
+			cin >> third;
+			String temp;
+			for (int i = 0; i < third.getlen(); ++i)
+			{
+				char c = third[i];
+				if (c == '<' || c == '>' || c == '"')  // Ignoring enclosing characters
+				{
+					continue;
+				}
+				temp = temp + c;
+			}
+			third = temp;  // Removed enclosing characters
+		}
 
 		// All inputs
 
@@ -86,7 +101,53 @@ void Console::run()  // Program Loop
 			// Display all branches
 			cout << "Temp1" << endl << "Temp2";
 		}
-
+		else if (command.compare("delete-branch"))
+		{
+			// second stores branch name
+			cout << "Branch" << '\'' << second << '\'' << " deleted successfully.";
+		}
+		else if (command.compare("merge"))
+		{
+			// second stores the source branch
+			// third stores the target branch
+			cout << "Merged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.";
+		}
+		else if (command.compare("visualize-tree"))
+		{
+			// BONUS //
+			// DO AT THE END //
+			// second stores the branch the visualize
+			// Call the respective display functions
+		}
+		else if (command.compare("log"))
+		{
+			cout << "Commit History for " << '\'' << "feature-1" << '\'' << ':' << endl;  // Replace with current branch
+			cout << "Commit #3: " << '"' << "Refactored feature implementation" << '"' << '.' << endl;  // Replace with the real message
+			cout << "Commit #2: " << '"' << "Added new feature to branch" << '"' << '.' << endl;
+			cout << "Commit #1: " << '"' << "Initialized branch" << '"' << '.';
+		}
+		else if (command.compare("current-branch"))
+		{
+			cout << "You are on branch: " << '\'' << "main" << '\'' << '.';  // Replace with current branch
+		}
+		else if (command.compare("save"))
+		{
+			cout << "Repository saved successfully to " << '\'' << "repo_data.txt" << '\'' << '.';  // Replace with the real filename
+		}
+		else if (command.compare("load"))
+		{
+			// second stores file name
+			cout << "Repository loaded successfully from " << '\'' << second << '\'' << '.';
+		}
+		else if (command.compare("exit"))
+		{
+			cout << "Exiting GitLite...";
+			break;
+		}
+		else
+		{
+			cout << "Invalid command. Please try again.";
+		}
 
 
 
