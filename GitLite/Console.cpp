@@ -17,6 +17,11 @@ void Console::run()  // Program Loop
 		cout << '>';  // Ready for user input
 		cin >> command;
 		command.to_lower();  // Convert to lowercase to make everything consistent
+		if (command.compare("exit"))
+		{
+			cout << "\033[33mExiting GitLite...\033[0m";
+			break;
+		}
 		// For all commands that only have one part
 		if (!(command.compare("log") || command.compare("branches") || command.compare("current-branch") || command.compare("save")))
 		{
@@ -136,11 +141,6 @@ void Console::run()  // Program Loop
 		else if (command.compare("load"))
 		{
 			cout << "\033[33mRepository loaded successfully from '" << second << "'.\033[0m";
-		}
-		else if (command.compare("exit"))
-		{
-			cout << "\033[33mExiting GitLite...\033[0m";
-			break;
 		}
 		else
 		{
