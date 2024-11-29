@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AVL-Tree.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="String.h" />
   </ItemGroup>
