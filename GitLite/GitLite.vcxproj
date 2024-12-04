@@ -133,6 +133,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="string2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BTree.cpp" />

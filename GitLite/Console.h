@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
-#include "String.h"
-using namespace std;
+#include "../GitLite/string2.h"
 class Console
 {
 private:
