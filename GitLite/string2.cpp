@@ -8,7 +8,7 @@ ostream& operator<<(ostream& os, String& text)
 istream& operator>>(istream& in, String& text)
 {
 	char ch;
-	while (in.get(ch)) text += ch; // read entire input stream
+	while (in.get(ch) && ch != '\n' || ch != ' ') text += ch; // read entire input stream
 	text += '\0';
 	return in;
 }

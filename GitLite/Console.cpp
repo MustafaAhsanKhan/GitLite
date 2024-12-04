@@ -1,10 +1,12 @@
 #include "Console.h"
+#include <iomanip>
 Console::Console()
 {
 }
 
 void Console::run()  // Program Loop
 {
+	cin >> std::noskipws;  // To read spaces as well
 	while (true)
 	{
 		// The user can either input a single word command (init)
@@ -16,6 +18,7 @@ void Console::run()  // Program Loop
 		cout << '>';  // Ready for user input
 		cin >> command;
 		command.toLower();  // Convert to lowercase to make everything consistent
+		cout << command;
 
 		if (command == "exit")
 		{
