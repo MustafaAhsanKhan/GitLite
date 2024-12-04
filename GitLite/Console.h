@@ -1,5 +1,5 @@
 #pragma once
-#include "../GitLite/string2.h"
+#include "string2.h"
 class Console
 {
 private:

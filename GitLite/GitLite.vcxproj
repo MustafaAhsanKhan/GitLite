@@ -132,7 +132,6 @@
     <ClInclude Include="BTreeNode.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Parser.h" />
-    <ClInclude Include="String.h" />
     <ClInclude Include="string2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -140,7 +139,7 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
-    <ClCompile Include="String.cpp" />
+    <ClCompile Include="string2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

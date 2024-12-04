@@ -1,5 +1,4 @@
-#include "../GitLite/Console.h"
-//#include "../GitLite/BTreeNode.h"
+#include "Console.h"
 
 int main()
 {

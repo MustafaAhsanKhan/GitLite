@@ -178,15 +178,22 @@ public:
 		return true;
 	}
 
+	friend std::ostream& operator<<(std::ostream& os, String& str);
+	friend std::istream& operator>>(std::istream& is, String& str);
+
 };
 
-ostream& operator<<(ostream& os, String& text) {
-	os << text.getData();
-	return os;
-}
-istream& operator>>(istream& in, String& text) {
-	char ch;
-	while (in.get(ch)) text += ch; // read entire input stream
-	text += '\0';
-	return in;
-}
+
+
+//	String& getLine(std::istream& is, char delimiter);
+//	friend std::istream& operator>>(std::istream& is, String& str);
+//	friend std::ostream& operator<<(std::ostream& os, const String& str);
+//
+//private:
+//	// Helper functions
+//	int strlen(const char* c_str) const;
+//	void strcpy(char* dest, const char* src) const;
+//	bool strcmp(const char* c_str_1, const char* c_str_2) const;
+//};
+//std::istream& operator>>(std::istream& is, String& str);
+//std::ostream& operator<<(std::ostream& os, const String& str);
