@@ -14,12 +14,17 @@
 #include <iostream>
 using namespace std;
 //#include "../GitLite/AVL-Tree.h"
-#include "BTreeNode.h"
+#include "BTree.h"
 int main()
 {
 	BTree<int, 4> tree;
-	for (int i = 1; i <=20; i++) {
+	for (int i = 1; i <=124; i++) {
 		tree.insert(i);
+		cout << "-----------------";
+	}
+
+	for (int i = 1; i <= 124; i++) {
+		tree.remove(i);
 		cout << "-----------------";
 	}
 
