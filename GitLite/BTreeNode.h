@@ -5,14 +5,16 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <string>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::filesystem;
 
 template <typename T, int o>
 struct BTreeNode {
     int order = o, numOfKeys = 0;
     T keys[o];
-    string children[o];
+    fs::path children[o];
     bool isLeaf = true;
 
     BTreeNode() {
@@ -21,48 +23,74 @@ struct BTreeNode {
         }
     }
 
+    void writeKeys(const fs::path& path) {
+        for (int i = 0; i < numOfKeys; i++) {
+            ofstream keyFile(path.string() + "_key_" + to_string(i) + ".txt");
+            keyFile << keys[i];
+            keyFile.close();
+        }
+    }
+
+    void writeChildren(const fs::path& path) {
+        for (int i = 0; i < o; i++) {
+            ofstream childFile(path.string() + "_child_" + to_string(i) + ".txt");
+            childFile << children[i].string();
+            childFile.close();
+        }
+    }
+
+    void readKeys(const fs::path& path) {
+        for (int i = 0; i < numOfKeys; i++) {
+            ifstream keyFile(path.string() + "_key_" + to_string(i) + ".txt");
+            keyFile >> keys[i];
+            keyFile.close();
+        }
+    }
+
+    void readChildren(const fs::path& path) {
+        for (int i = 0; i < o; i++) {
+            ifstream childFile(path.string() + "_child_" + to_string(i) + ".txt");
+            string childPath;
+            childFile >> childPath;
+            children[i] = childPath;
+            childFile.close();
+        }
+    }
+
     string toString() {
         stringstream ss;
         ss << numOfKeys << " " << isLeaf << " ";
-        for (int i = 0; i < numOfKeys; i++) {
-            ss << keys[i] << " ";
-        }
-        for (int i = 0; i < o; i++) {
-            ss << children[i] << " ";
-        }
         return ss.str();
     }
 
     void fromString(const string& str) {
         stringstream ss(str);
         ss >> numOfKeys >> isLeaf;
-        for (int i = 0; i < numOfKeys; i++) {
-            ss >> keys[i];
-        }
-        for (int i = 0; i < o; i++) {
-            ss >> children[i];
-        }
     }
 };
 
 template <typename T, int o>
 class BTree {
     int nodeCount = 0;
-    string rootPath;
+    fs::path rootPath;
 
-    void writeNode(const string& path, BTreeNode<T, o>* node) {
-        ofstream file("tree\\"+path);
+    void writeNode(const fs::path& path, BTreeNode<T, o>* node) {
+        ofstream file("tree/" + path.string());
         file << node->toString();
         file.close();
+        node->writeKeys("tree/" + path.string());
+        node->writeChildren("tree/" + path.string());
     }
 
-    BTreeNode<T, o>* readNode(const string& path) {
-        ifstream file("tree\\"+path);
+    BTreeNode<T, o>* readNode(const fs::path& path) {
+        ifstream file("tree/" + path.string());
         stringstream buffer;
         buffer << file.rdbuf();
         file.close();
         BTreeNode<T, o>* node = new BTreeNode<T, o>();
         node->fromString(buffer.str());
+        node->readKeys("tree/" + path.string());
+        node->readChildren("tree/" + path.string());
         return node;
     }
 
@@ -76,15 +104,15 @@ class BTree {
         }
     }
 
-    BTreeNode<T, o>* insert(BTreeNode<T, o>* node, T data, BTreeNode<T, o>*& newChild, T& newKey, const string& path) {
-        
+    BTreeNode<T, o>* insert(BTreeNode<T, o>* node, T data, BTreeNode<T, o>*& newChild, T& newKey, const fs::path& path) {
         if (!node) {
             node = new BTreeNode<T, o>();
             node->keys[node->numOfKeys++] = data;
             newChild = nullptr;
             writeNode(path, node);
             return node;
-        } else {
+        }
+        else {
             if (node->isLeaf) {
                 node->keys[node->numOfKeys++] = data;
                 sort(node->keys, node->numOfKeys);
@@ -97,12 +125,14 @@ class BTree {
                     node->numOfKeys = o / 2;
                     writeNode(path, node);
                     return node;
-                } else {
+                }
+                else {
                     newChild = nullptr;
                     writeNode(path, node);
                     return node;
                 }
-            } else {
+            }
+            else {
                 int i = 0;
                 while (i < node->numOfKeys && data > node->keys[i]) {
                     i++;
@@ -117,8 +147,8 @@ class BTree {
                         node->children[j + 1] = node->children[j];
                     }
                     node->keys[i] = newKeyLocal;
-                    string newChildPath = "node_" + to_string(nodeCount) + ".txt";
-					nodeCount++;
+                    fs::path newChildPath = "node_" + to_string(nodeCount) + ".txt";
+                    nodeCount++;
                     node->children[i + 1] = newChildPath;
                     writeNode(newChildPath, newChildLocal);
                     node->numOfKeys++;
@@ -134,12 +164,14 @@ class BTree {
                         node->numOfKeys = o / 2;
                         writeNode(path, node);
                         return node;
-                    } else {
+                    }
+                    else {
                         newChild = nullptr;
                         writeNode(path, node);
                         return node;
                     }
-                } else {
+                }
+                else {
                     writeNode(path, node);
                     return node;
                 }
@@ -179,7 +211,7 @@ public:
         if (newChild) {
             BTreeNode<T, o>* newRoot = new BTreeNode<T, o>();
             newRoot->keys[0] = newKey;
-            string newChildPath = "node_" + to_string(nodeCount) + ".txt";
+            fs::path newChildPath = "node_" + to_string(nodeCount) + ".txt";
             newRoot->children[0] = rootPath;
             newRoot->children[1] = newChildPath;
             newRoot->numOfKeys = 1;
@@ -187,7 +219,8 @@ public:
             writeNode(newChildPath, newChild);
             rootPath = "root_" + to_string(nodeCount) + ".txt";
             writeNode(rootPath, newRoot);
-        } else {
+        }
+        else {
             writeNode(rootPath, root);
         }
         cout << endl;

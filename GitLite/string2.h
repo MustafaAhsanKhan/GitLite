@@ -67,6 +67,20 @@ public:
 		}
 		push_back('\0'); // add null character at the end
 	}
+	String(const char* text) {
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]); // add text to the array
+		}
+		push_back('\0'); // add null character at the end
+	}
+	String(String& text) {
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]); // add text to the array
+		}
+		push_back('\0'); // add null character at the end
+	}
 	void operator+=(char val) {
 		len--;
 		push_back(val); // add val to the array
@@ -80,7 +94,39 @@ public:
 		}
 		push_back('\0');
 	}
+	void operator+=(String text) {
+		len--;
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]);
+		}
+		push_back('\0');
+	}
+	void operator+=(string text) {
+		len--;
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]);
+		}
+		push_back('\0');
+	}
 	void operator=(const char* text) {
+		len = 0;
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]);
+		}
+		push_back('\0');
+	}
+	void operator=(String text) {
+		len = 0;
+		int i = 0;
+		while (text[i++]) {
+			push_back(text[i - 1]);
+		}
+		push_back('\0');
+	}
+	void operator=(string text) {
 		len = 0;
 		int i = 0;
 		while (text[i++]) {
