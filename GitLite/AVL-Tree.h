@@ -1,11 +1,12 @@
 #pragma once
 #include "string2.h"
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 using namespace filesystem;
 
-//template <class T>  // Why does this fix errors?
 // An AVL tree node
 struct Node
 {
@@ -14,16 +15,16 @@ struct Node
     int balanceFactor;
     String leftFile;
     String rightFile;
-    Vector<String> dataRow;
+    String dataRow; // Store the data row in a single String
 
-    Node(const String& k, int leaf, int balance, const String& left, const String& right, const Vector<String>& data)
-        : key(k), isLeaf(leaf), balanceFactor(balance), leftFile(left), rightFile(right), dataRow(data) {}
+    Node(const String& k, int leaf, int balance, const String& left, const String& right, const String& data)
+        : key(k), isLeaf(leaf), balanceFactor(balance), leftFile(left), rightFile(right), dataRow(data) {
+    }
 };
 
-template <class T>
 class AVL {
 private:
-    String rootFileName;
+    filesystem::path& filePath
     int nodeCount;
 
     // Helper functions
@@ -38,7 +39,6 @@ public:
 
     void customGetline(ifstream& file, String& line, char delimiter = '\n')
     {
-
         char ch;
         while (file.get(ch)) {
             if (ch == delimiter) {
@@ -53,15 +53,13 @@ public:
         ifstream nodeFile(filePath);
         if (!nodeFile.is_open())
         {
-            const Vector<String> empty;
             String empty_str("");
             // Handle file not found
-            return Node(empty_str, 0, 0, empty_str, empty_str, empty);
+            return Node(empty_str, 0, 0, empty_str, empty_str, empty_str);
         }
 
-        String key, leftFile, rightFile, line;
+        String key, leftFile, rightFile, dataRow, line;
         int isLeaf, balanceFactor;
-        Vector<String> dataRow;
 
         customGetline(nodeFile, key);
         nodeFile >> isLeaf;
@@ -71,13 +69,12 @@ public:
         customGetline(nodeFile, rightFile);
 
         while (customGetline(nodeFile, line)) {
-            dataRow.push_back(line);
+            dataRow += line + "\n";
         }
         nodeFile.close();
 
         return Node(key, isLeaf, balanceFactor, leftFile, rightFile, dataRow);
     }
-
 
     void writeNodeToFile(const Node& node, const String& fileName)
     {
@@ -87,19 +84,15 @@ public:
         nodeFile << node.balanceFactor << endl;
         nodeFile << node.leftFile << endl;
         nodeFile << node.rightFile << endl;
-        for (const auto& data : node.dataRow)
-        {
-            nodeFile << data << endl;
-        }
+        nodeFile << node.dataRow; // Write the data row as a single string
         nodeFile.close();
     }
 
-
-    void insert(const String& key, const Vector<String>& dataRow) {
+    void insert(const String& key, const String& dataRow) {
         rootFileName = insertHelper(rootFileName, key, dataRow);
     }
 
-    String insertHelper(const String& nodeFileName, const String& key, const Vector<String>& dataRow) {
+    String insertHelper(const filesystem::path& nodeFileName, const String& key, const String& dataRow) {
         if (nodeFileName.empty()) {
             // Create new node
             String newNodeFile = generateFileName(key);
@@ -170,10 +163,7 @@ public:
         inOrderTraversal(rootFileName);
     }
 
-
-
     // Similarly implement leftRotate
-
 
     // Implement delete and rotation methods similarly
 };

@@ -4,7 +4,7 @@
 using namespace std;
 #include "../GitLite/AVL-Tree.h"
 int main() {
-    AVL<String> tree;
+    AVL tree;
 
     // Insert nodes
     Vector<String> dataRow1 = { "Data for node 1" };
