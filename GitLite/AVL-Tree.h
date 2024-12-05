@@ -7,12 +7,12 @@
 using namespace std;
 
 // An AVL tree node
-template<typename T>
+template<class T>
 struct Node
 {
     T key;
-    String left;
-    String right;
+    Node<T>* left;
+    Node<T>* right;
     int height;
 
     Node(T k)
@@ -23,7 +23,7 @@ struct Node
         height = 1;
     }
 };
-template<typename T>
+template<class T>
 class AVL
 {
 
@@ -280,48 +280,49 @@ public:
         }
     }
 
-    void LevelOrderTraversal()
-    {
-        if (!root) {
-            cout << "Tree is empty." << endl;
-            return;
-        }
+    //void LevelOrderTraversal()
+    //{
+    //    if (!root) {
+    //        cout << "Tree is empty." << endl;
+    //        return;
+    //    }
 
-        int height = root->height;
-        int maxWidth = pow(2, height) - 1; // Maximum width of the last level
-        queue<Node<T>*> q;
-        q.push(root);
+    //    int height = root->height;
+    //    int maxWidth = pow(2, height) - 1; // Maximum width of the last level
+    //    queue<Node<T>*> q; // Explicitly specify the type of the queue
+    //    q.push(root);
 
-        for (int level = 0; level < height; ++level) {
-            int levelNodes = pow(2, level);
-            int spaceBetween = maxWidth / levelNodes;
+    //    for (int level = 0; level < height; ++level) {
+    //        int levelNodes = pow(2, level);
+    //        int spaceBetween = maxWidth / levelNodes;
 
-            // Print the level nodes
-            for (int i = 0; i < levelNodes; ++i) {
-                Node<T>* current = q.front();
-                q.pop();
+    //        // Print the level nodes
+    //        for (int i = 0; i < levelNodes; ++i) {
+    //            Node<T>* current = q.front();
+    //            q.pop();
 
-                if (i == 0) // Print leading spaces for the first node
-                    cout << string((spaceBetween - 1) / 2, ' ');
+    //            if (i == 0) // Print leading spaces for the first node
+    //                cout << string((spaceBetween - 1) / 2, ' ');
 
-                if (current) {
-                    cout << setw(5) << current->key;
-                    q.push(current->left);
-                    q.push(current->right);
-                }
-                else {
-                    cout << "  ";
-                    q.push(nullptr); // Placeholder for left and right of null
-                    q.push(nullptr);
-                }
+    //            if (current) {
+    //                cout << setw(5) << current->key;
+    //                q.push(current->left);
+    //                q.push(current->right);
+    //            }
+    //            else {
+    //                cout << "  ";
+    //                q.push(nullptr); // Placeholder for left and right of null
+    //                q.push(nullptr);
+    //            }
 
-                if (i != levelNodes - 1) // Print spaces between nodes
-                    cout << string(spaceBetween, ' ');
-            }
-            cout << endl;
-            maxWidth /= 2; // Halve the max width for the next level
-        }
-    }
+    //            if (i != levelNodes - 1) // Print spaces between nodes
+    //                cout << string(spaceBetween, ' ');
+    //        }
+    //        cout << endl;
+    //        maxWidth /= 2; // Halve the max width for the next level
+    //    }
+    //}
+
 
     void insert(int key)
     {
