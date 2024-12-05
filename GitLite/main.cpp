@@ -1,10 +1,13 @@
-#include "../GitLite/Console.h"
+#include "Console.h"
 //#include "../GitLite/BTreeNode.h"
-
+#include <fstream>
+#include <iostream>
 int main()
 {
-	Console C1;
-	C1.run();  // Program Loop
+	ifstream file("input.txt");
+	String filetext;
+	cin >> filetext;
+	cout << filetext;
 	return 0;
 }
 

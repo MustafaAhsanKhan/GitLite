@@ -11,7 +11,7 @@ protected:
 public:
 	Vector() {
 		len = 0;
-		max = 250;
+		max = 1;
 		data = new T[max]();
 	}
 	Vector(int len) {
@@ -19,7 +19,7 @@ public:
 		max = 250;
 		data = new T[max]();
 	}
-	T* getData() {
+	T* getData() const {
 		return data;
 	}
 	T& operator[](int index) {
@@ -32,10 +32,10 @@ public:
 		data[len] = val; // add val to last index
 		len++;
 		if (len == max) { // if array is full, increase length by 100
-			max += 100;
+			max *= 2;
 			T* temp = data;
 			data = new T[max];
-			for (int i = 0; i < max - 100; i++) data[i] = temp[i];
+			for (int i = 0; i < max /2; i++) data[i] = temp[i];
 		}
 	}
 	int find(T val) { // get the index of val
@@ -178,15 +178,10 @@ public:
 		return true;
 	}
 
-};
+	friend ostream& operator<<(ostream& os,const  String& text);
+	friend istream& operator>>(istream& in, String& text);
+	friend ofstream& operator<<(ofstream& os, String& text);
+	friend ifstream& operator>>(ifstream& in, String& text);
+	
 
-ostream& operator<<(ostream& os, String& text) {
-	os << text.getData();
-	return os;
-}
-istream& operator>>(istream& in, String& text) {
-	char ch;
-	while (in.get(ch)) text += ch; // read entire input stream
-	text += '\0';
-	return in;
-}
+};

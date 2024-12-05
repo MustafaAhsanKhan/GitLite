@@ -1,5 +1,7 @@
 #include "Console.h"
-
+#include <iostream>
+#include <fstream>
+using namespace std;
 Console::Console()
 {
 }
@@ -13,7 +15,6 @@ void Console::run()  // Program Loop
 		// The additional part can be enclosed in quotes or angle brackets
 		// The command and second strings allow us to split these into two
 		// Further allowing us to use them where needed
-
 		cout << '>';  // Ready for user input
 		cin >> command;
 		command.toLower();  // Convert to lowercase to make everything consistent
