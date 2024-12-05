@@ -2,17 +2,20 @@
 #include <iostream>
 #include <iomanip>
 #include <queue>
+#include "string2.h"
+
 using namespace std;
 
 // An AVL tree node
+template<typename T>
 struct Node
 {
-    int key;
-    Node* left;
-    Node* right;
+    T key;
+    String left;
+    String right;
     int height;
 
-    Node(int k)
+    Node(T k)
     {
         key = k;
         left = nullptr;
@@ -20,12 +23,12 @@ struct Node
         height = 1;
     }
 };
-
+template<typename T>
 class AVL
 {
 
 private:
-    Node* root;
+    Node<T>* root;
 public:
 
 	AVL()
@@ -33,14 +36,14 @@ public:
 		root = nullptr;
 	}
 
-	Node* getRoot()
+	Node<T>* getRoot()
 	{
 		return root;
 	}
 
     // A utility function to get the height 
     // of the tree
-    int height(Node* N)
+    int height(Node<T>* N)
     {
         if (N == nullptr)
             return 0;
@@ -49,10 +52,10 @@ public:
 
     // A utility function to right rotate 
     // subtree rooted with y
-    Node* rightRotate(Node* y)
+    Node<T>* rightRotate(Node<T>* y)
     {
-        Node* x = y->left;
-        Node* T2 = x->right;
+        Node<T>* x = y->left;
+        Node<T>* T2 = x->right;
 
         // Perform rotation
         x->right = y;
@@ -70,10 +73,10 @@ public:
 
     // A utility function to left rotate 
     // subtree rooted with x
-    Node* leftRotate(Node* x)
+    Node<T>* leftRotate(Node<T>* x)
     {
-        Node* y = x->right;
-        Node* T2 = y->left;
+        Node<T>* y = x->right;
+        Node<T>* T2 = y->left;
 
         // Perform rotation
         y->left = x;
@@ -90,7 +93,7 @@ public:
     }
 
     // Get Balance factor of node N
-    int getBalance(Node* N)
+    int getBalance(Node<T>* N)
     {
         if (N == nullptr)
             return 0;
@@ -98,11 +101,11 @@ public:
             height(N->right);
     }
 
-    Node* insertHelper(Node* node, int key)
+    Node<T>* insertHelper(Node<T>* node, int key)
     {
         // 1. Perform the normal BST rotation
         if (node == nullptr)
-            return new Node(key);
+            return new Node<T>(key);
 
         if (key < node->key)
             node->left = insertHelper(node->left, key);
@@ -153,9 +156,9 @@ public:
     // return the node with minimum key value 
     // found in that tree. Note that the entire 
     // tree does not need to be searched.
-    Node* minValueNode(Node* node)
+    Node<T>* minValueNode(Node<T>* node)
     {
-        Node* current = node;
+        Node<T>* current = node;
 
         // loop down to find the leftmost leaf
         while (current->left != nullptr)
@@ -167,7 +170,7 @@ public:
     // Recursive function to delete a node with 
     // given key from subtree with given root. 
     // It returns root of the modified subtree.
-    Node* deleteNodeHelper(Node* root, int key)
+    Node<T>* deleteNodeHelper(Node<T>* root, int key)
     {
         // STEP 1: PERFORM STANDARD BST DELETE
         if (root == nullptr)
@@ -193,7 +196,7 @@ public:
             if ((root->left == nullptr) ||
                 (root->right == nullptr))
             {
-                Node* temp = root->left ?
+                Node<T>* temp = root->left ?
                     root->left : root->right;
 
                 // No child case
@@ -212,7 +215,7 @@ public:
                 // node with two children: Get the 
                 // inorder successor (smallest in 
                 // the right subtree)
-                Node* temp = minValueNode(root->right);
+                Node<T>* temp = minValueNode(root->right);
 
                 // Copy the inorder successor's 
                 // data to this node
@@ -267,7 +270,7 @@ public:
 
     // A utility function to print preorder 
     // traversal of the tree. 
-    void InOrder(Node* root)
+    void InOrder(Node<T>* root)
     {
         if (root != nullptr)
         {
@@ -286,7 +289,7 @@ public:
 
         int height = root->height;
         int maxWidth = pow(2, height) - 1; // Maximum width of the last level
-        queue<Node*> q;
+        queue<Node<T>*> q;
         q.push(root);
 
         for (int level = 0; level < height; ++level) {
@@ -295,7 +298,7 @@ public:
 
             // Print the level nodes
             for (int i = 0; i < levelNodes; ++i) {
-                Node* current = q.front();
+                Node<T>* current = q.front();
                 q.pop();
 
                 if (i == 0) // Print leading spaces for the first node

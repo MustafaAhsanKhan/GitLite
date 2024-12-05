@@ -1,14 +1,29 @@
 #include "string2.h"
-
-ostream& operator<<(ostream& os, String& text)
-{
-	os << text.getData();
-	return os;
+#include <fstream>
+ostream& operator<<(ostream& os, const String& text) {
+    os << text.getData();
+    return os;
 }
-istream& operator>>(istream& in, String& text)
-{
-	char ch;
-	while (in.get(ch) && ch != '\n' || ch != ' ') text += ch; // read entire input stream
-	text += '\0';
-	return in;
+
+istream& operator>>(istream& in, String& text) {
+    text = ""; // Clear the current content of text
+    char ch;
+    while (in.get(ch) && ch != '\n') {
+        text += ch;
+    }
+    return in;
+}
+
+ofstream& operator<<(ofstream& os, String& text) {
+    os << text.getData();
+    return os;
+}
+
+ifstream& operator>>(ifstream& in, String& text) {
+    text = ""; // Clear the current content of text
+    char ch;
+    while (in.get(ch)) {
+        text += ch;
+    }
+    return in;
 }

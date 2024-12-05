@@ -11,7 +11,7 @@ protected:
 public:
 	Vector() {
 		len = 0;
-		max = 250;
+		max = 1;
 		data = new T[max]();
 	}
 	Vector(int len) {
@@ -19,7 +19,7 @@ public:
 		max = 250;
 		data = new T[max]();
 	}
-	T* getData() {
+	T* getData() const {
 		return data;
 	}
 	T& operator[](int index) {
@@ -32,10 +32,10 @@ public:
 		data[len] = val; // add val to last index
 		len++;
 		if (len == max) { // if array is full, increase length by 100
-			max += 100;
+			max *= 2;
 			T* temp = data;
 			data = new T[max];
-			for (int i = 0; i < max - 100; i++) data[i] = temp[i];
+			for (int i = 0; i < max / 2; i++) data[i] = temp[i];
 		}
 	}
 	int find(T val) { // get the index of val
@@ -178,22 +178,10 @@ public:
 		return true;
 	}
 
-	friend std::ostream& operator<<(std::ostream& os, String& str);
-	friend std::istream& operator>>(std::istream& is, String& str);
+	friend ostream& operator<<(ostream& os, const  String& text);
+	friend istream& operator>>(istream& in, String& text);
+	friend ofstream& operator<<(ofstream& os, String& text);
+	friend ifstream& operator>>(ifstream& in, String& text);
+
 
 };
-
-
-
-//	String& getLine(std::istream& is, char delimiter);
-//	friend std::istream& operator>>(std::istream& is, String& str);
-//	friend std::ostream& operator<<(std::ostream& os, const String& str);
-//
-//private:
-//	// Helper functions
-//	int strlen(const char* c_str) const;
-//	void strcpy(char* dest, const char* src) const;
-//	bool strcmp(const char* c_str_1, const char* c_str_2) const;
-//};
-//std::istream& operator>>(std::istream& is, String& str);
-//std::ostream& operator<<(std::ostream& os, const String& str);
