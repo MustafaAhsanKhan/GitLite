@@ -150,6 +150,23 @@ public:
 		}
 		push_back('\0');
 	}
+
+	bool isGreaterThan(const String& other) const
+	{
+		int i = 0;
+		while (data[i] && other.data[i])
+		{
+			if (data[i] > other.data[i]) return true;
+			if (data[i] < other.data[i]) return false;
+			i++;
+		}
+		// If one string is a prefix of the other, the longer string is greater
+		if (data[i] && !other.data[i]) return true;
+		if (!data[i] && other.data[i]) return false;
+		return false; // Strings are equal
+	}
+
+
 	bool operator==(const char* text) { // check character by character
 		int i = 0;
 		while (data[i] && text[i]) {
