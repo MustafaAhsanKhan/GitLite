@@ -9,8 +9,7 @@
 
 using namespace std;
 
-bool customGetline(std::ifstream& file, String& line, char delimiter = '\n')
-{
+bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
     line.clear();
     char ch;
     while (file.get(ch)) {
@@ -27,6 +26,12 @@ int main() {
     String csvFileName;
     cout << "Enter the CSV file name (with extension): ";
     cin >> csvFileName;
+
+    String directoryName = "temp";
+    //cout << "Enter the directory name to store node files: ";
+    //cin >> directoryName;
+
+    tree.initialize(directoryName);
 
     ifstream csvFile(csvFileName.getData());
     if (!csvFile.is_open()) {
@@ -114,4 +119,3 @@ int main() {
 
     return 0;
 }
-

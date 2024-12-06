@@ -3,11 +3,12 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 using namespace std;
 namespace fs = std::filesystem;
 
-String to_string(int value) {
+String custom_to_string(int value) {
     String result;
     bool isNegative = false;
 
@@ -35,6 +36,7 @@ String to_string(int value) {
         result[i] = result[len - i - 1];
         result[len - i - 1] = temp;
     }
+    cout << "CUSTOM TO STRING " << result << endl;
 
     return result;
 }
@@ -58,18 +60,32 @@ class AVL {
 private:
     fs::path rootFileName;
     int nodeCount;
+    fs::path directoryPath;
 
-    String generateFileName(String key)
+    void createDirectory(const String& dirName) {
+        directoryPath = fs::path(dirName.getData());
+        if (!fs::exists(directoryPath)) {
+            fs::create_directory(directoryPath);
+        }
+    }
+
+    fs::path generateFileName(String key)
     {
-        String fileName = key + ' ' + to_string(nodeCount++) + ".txt";
-        return fileName;
+        String temp = "";
+        String fileName =  temp + to_string(nodeCount++) + ".txt";
+        return (directoryPath / fileName.getData());
     }
 
     // Modify insert and delete functions to work with filenames
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
+    void initialize(const String& dirName) {
+        createDirectory(dirName);
+    }
+
     void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
+        line.clear();
         char ch;
         while (file.get(ch)) {
             if (ch == delimiter) {
@@ -106,12 +122,12 @@ public:
 
     void writeNodeToFile(const Node& node, const fs::path& filePath) {
         std::ofstream nodeFile(filePath);
-        nodeFile << node.key << std::endl;
-        nodeFile << node.isLeaf << std::endl;
-        nodeFile << node.balanceFactor << std::endl;
-        nodeFile << node.leftFile << std::endl;
-        nodeFile << node.rightFile << std::endl;
-        nodeFile << node.dataRow; // Write the data row as a single string
+        nodeFile << node.key << '\n';
+        nodeFile << node.isLeaf << '\n';
+        nodeFile << node.balanceFactor << '\n';
+        nodeFile << node.leftFile << '\n';
+        nodeFile << node.rightFile << '\n';
+        nodeFile << node.dataRow; // No extra newline here
         nodeFile.close();
     }
 
@@ -122,7 +138,7 @@ public:
     fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow) {
         if (nodeFileName.empty()) {
             // Create new node
-            fs::path newNodeFile = generateFileName(key).getData();
+            fs::path newNodeFile = generateFileName(key);
             Node newNode(key, 1, 0, "", "", dataRow);
             writeNodeToFile(newNode, newNodeFile);
             return newNodeFile;
@@ -134,9 +150,7 @@ public:
         if (node.leftFile.getData() == nodeFileName) { node.leftFile = ""; }
         if (node.rightFile.getData() == nodeFileName) { node.rightFile = ""; }
 
-
-        if (key.isGreaterThan(node.key) == 2)
-        {
+        if (key.isGreaterThan(node.key) == 2) {
             node.leftFile = insertHelper(node.leftFile.getData(), key, dataRow).string();
         }
         else if (key.isGreaterThan(node.key) == 1) {
@@ -146,6 +160,8 @@ public:
             // Duplicate keys are not allowed
             return nodeFileName;
         }
+
+        node.isLeaf = 0; // Node now has a child, so it's not a leaf
 
         // Update heights and balance factors
         updateHeight(nodeFileName);
@@ -192,58 +208,81 @@ public:
         writeNodeToFile(node, nodeFileName);
     }
 
-
     fs::path rightRotate(const fs::path& yFileName) {
         Node y = readNodeFromFile(yFileName);
-        Node x = readNodeFromFile(y.leftFile.getData());
-        String T2File = x.rightFile;
+        fs::path xFileName = y.leftFile.getData();
+        Node x = readNodeFromFile(xFileName);
+        fs::path T2FileName = x.rightFile.getData();
 
         // Perform rotation
         x.rightFile = yFileName.string();
-        y.leftFile = T2File;
+        y.leftFile = T2FileName.string();
 
-        // Update balance factors
-        updateHeight(yFileName);
-        updateHeight(x.leftFile.getData());
+        // Update `isLeaf` flags
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
 
         // Write updated nodes back to files
         writeNodeToFile(y, yFileName);
-        writeNodeToFile(x, x.leftFile.getData());
+        writeNodeToFile(x, xFileName);
 
-        return x.leftFile.getData(); // New root after rotation
+        // Update heights and balance factors after writing nodes back
+        updateHeight(yFileName);
+        updateHeight(xFileName);
+
+        return xFileName; // New root after rotation
     }
+
 
     fs::path leftRotate(const fs::path& xFileName) {
         Node x = readNodeFromFile(xFileName);
-        Node y = readNodeFromFile(x.rightFile.getData());
-        String T2File = y.leftFile;
+        fs::path yFileName = x.rightFile.getData();
+        Node y = readNodeFromFile(yFileName);
+        fs::path T2FileName = y.leftFile.getData();
 
         // Perform rotation
         y.leftFile = xFileName.string();
-        x.rightFile = T2File;
+        x.rightFile = T2FileName.string();
 
-        // Update balance factors
-        updateHeight(xFileName);
-        updateHeight(y.leftFile.getData());
+        // Update `isLeaf` flags
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
 
         // Write updated nodes back to files
         writeNodeToFile(x, xFileName);
-        writeNodeToFile(y, y.leftFile.getData());
+        writeNodeToFile(y, yFileName);
 
-        return y.leftFile.getData(); // New root after rotation
+        // Update heights and balance factors after writing nodes back
+        updateHeight(xFileName);
+        updateHeight(yFileName);
+
+        return yFileName; // New root after rotation
     }
 
-    int getHeight(const fs::path& nodeFileName)
-    {
-        if (nodeFileName.empty()) return 0;
+
+    int getHeight(const fs::path& nodeFileName) {
+        std::cout << "getHeight called with nodeFileName: " << nodeFileName << std::endl;
+
+        if (nodeFileName.empty()) {
+            std::cout << "Empty nodeFileName. Returning 0." << std::endl;
+            return 0;
+        }
+
         Node node = readNodeFromFile(nodeFileName);
-       
-        if (node.key.empty()) return 0;
-        // Base case: if node doesn't exist
-       
-        return 1 + max(getHeight(node.leftFile.getData()), getHeight(node.rightFile.getData()));
+        std::cout << "Node key: " << node.key << ", isLeaf: " << node.isLeaf << std::endl;
+
+        if (node.isLeaf) {
+            std::cout << "Leaf node. Returning 1." << std::endl;
+            return 1;
+        }
+
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+
+        int height = 1 + std::max(leftHeight, rightHeight);
+        std::cout << "Returning height: " << height << " for node key: " << node.key << std::endl;
+        return height;
     }
-   
 
     int getBalanceFactor(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return 0;

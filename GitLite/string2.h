@@ -175,6 +175,16 @@ public:
 		return *this;
 	}
 
+	String operator+(string val) {
+		len--;
+		int i = 0;
+		while (val[i++]) {
+			push_back(val[i - 1]);
+		}
+		push_back('\0');
+		return *this;
+	}
+
 
 	int isGreaterThan(String other) const  // 1 means greater // 2 means less // 3 means equal
 	{
