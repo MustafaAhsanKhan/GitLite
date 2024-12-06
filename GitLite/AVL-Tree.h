@@ -82,9 +82,8 @@ public:
     Node readNodeFromFile(const fs::path& filePath) {
         std::ifstream nodeFile(filePath);
         if (!nodeFile.is_open()) {
-            String empty_str("");
-            // Handle file not found
-            return Node(empty_str, 0, 0, empty_str, empty_str, empty_str);
+            // Return a node indicating that it doesn't exist
+            return Node("", 0, 0, "", "", "");
         }
 
         String key, leftFile, rightFile, dataRow, line;
@@ -130,6 +129,11 @@ public:
         }
 
         Node node = readNodeFromFile(nodeFileName);
+
+        // In your insertHelper function, before assigning child files:
+        if (node.leftFile.getData() == nodeFileName) { node.leftFile = ""; }
+        if (node.rightFile.getData() == nodeFileName) { node.rightFile = ""; }
+
 
         if (key.isGreaterThan(node.key) == 2)
         {
@@ -229,11 +233,17 @@ public:
         return y.leftFile.getData(); // New root after rotation
     }
 
-    int getHeight(const fs::path& nodeFileName) {
+    int getHeight(const fs::path& nodeFileName)
+    {
         if (nodeFileName.empty()) return 0;
         Node node = readNodeFromFile(nodeFileName);
+       
+        if (node.key.empty()) return 0;
+        // Base case: if node doesn't exist
+       
         return 1 + max(getHeight(node.leftFile.getData()), getHeight(node.rightFile.getData()));
     }
+   
 
     int getBalanceFactor(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return 0;

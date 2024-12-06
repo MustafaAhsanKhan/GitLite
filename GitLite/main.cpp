@@ -41,9 +41,11 @@ int main() {
     vector<String> headers;
     String header;
     int pos = 0;
-    for (int i = 0; headerLine[i] != '\0'; ++i) {
+    for (int i = 0; headerLine[i] != '\0'; i++) {
         if (headerLine[i] == ',') {
             headers.push_back(header);
+            cout << header;
+            cout << endl;
             header.clear();
         }
         else {

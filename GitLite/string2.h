@@ -45,7 +45,8 @@ public:
 	}
 	void clear() { // clear the array
 		len = 0;
-		data = new char[max]();
+		data = new char[max];
+		push_back('\0');
 	}
 	char* getDup() { // get a duplicate of the array
 		char* dup = new char[len];
