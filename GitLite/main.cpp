@@ -1,80 +1,115 @@
-#include "Console.h"
+#include "string2.h"
 #include "AVL-Tree.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <iomanip>
 
-int main()
+using namespace std;
+
+bool customGetline(std::ifstream& file, String& line, char delimiter = '\n')
 {
-	Console C1;
-	C1.run();  // Program Loop
-	return 0;
+    line.clear();
+    char ch;
+    while (file.get(ch)) {
+        if (ch == delimiter) {
+            return true; // Successfully read a line
+        }
+        line += ch;
+    }
+    return !line.empty(); // Return true if there was any content read before EOF
 }
 
-//#include <iostream>
-//using namespace std;
-//#include "../GitLite/AVL-Tree.h"
-// +++++++++++++++++++++++++++++++++
-//int main()
-//{
-//	//BTree<int, 4> tree;
-//	//tree.insert(1);
-//	//cout << "-----------------";
-//	//tree.insert(2);
-//	//cout << "-----------------";
-//	//tree.insert(3);
-//	//cout << "-----------------";
-//	//tree.insert(4);
-//	//cout << "-----------------";
-//	//tree.insert(5);
-//	//cout << "-----------------";
-//	//tree.insert(6);
-//	//cout << "-----------------";
-//	//tree.insert(7);
-//	//cout << "-----------------";
-//
-//	//for (int i = 0; i < 50; i++) {
-//	//	tree.insert(i);
-//	//	cout << "-----------------";
-//	//}
-//
-//	//Console C1;
-//	//C1.run();  // Program Loop
-//	AVL tree;
-//
-//	// Constructing tree given in the 
-//	// above figure
-//	tree.insert(10);
-//	tree.insert(20);
-//	tree.insert(30);
-//	tree.insert(40);
-//	tree.insert(50);
-//	tree.insert(25);
-//	tree.insert(35);
-//	tree.insert(45);
-//
-//	// The constructed AVL Tree would be
-//	//			 30
-//	//		    /  \
-//    //		  20    40
-//	//		 /  \   / \
-//    //		10   25 35 50
-//	//				   /
-//	//				 45
-//
-//	cout << "Preorder traversal of the constructed AVL tree is \n";
-//	tree.LevelOrderTraversal();
-//
-//	// Output: 30 20 10 25 40 50
-//
-//	// deletion
-//	tree.deleteNode(20);
-//	tree.deleteNode(30);
-//
-//	// The AVL Tree after deletion of 20 and 30
-//	//			40
-//	//		   /  \
-//    //		  10   50		
-//
-//	cout << "\nPreorder traversal after deletion of 20 and 30 \n";
-//	tree.LevelOrderTraversal();
-//
-//	return 0;
-//}
+int main() {
+    AVL tree;
+    String csvFileName;
+    cout << "Enter the CSV file name (with extension): ";
+    cin >> csvFileName;
+
+    ifstream csvFile(csvFileName.getData());
+    if (!csvFile.is_open()) {
+        cout << "Unable to open the CSV file." << endl;
+        return 1;
+    }
+
+    // Read the header line to get column names
+    String headerLine;
+    customGetline(csvFile, headerLine);
+    string headerLineStr;
+    vector<String> headers;
+    String header;
+    int pos = 0;
+    for (int i = 0; headerLine[i] != '\0'; ++i) {
+        if (headerLine[i] == ',') {
+            headers.push_back(header);
+            header.clear();
+        }
+        else {
+            header += headerLine[i];
+        }
+        pos = i;
+    }
+    // Add the last header after the loop
+    header += headerLine[pos + 1];
+    headers.push_back(header);
+
+    // Display available columns
+    cout << "Available columns:" << endl;
+    for (size_t i = 0; i < headers.size(); ++i) {
+        cout << i + 1 << ": " << headers[i].getData() << endl;
+    }
+
+    int columnChoice;
+    cout << "Select a column number to use as the key: ";
+    cin >> columnChoice;
+    --columnChoice; // Adjust for zero-based index
+
+    if (columnChoice < 0 || columnChoice >= headers.size()) {
+        cout << "Invalid column choice." << endl;
+        return 1;
+    }
+
+    // Read and process each row
+    String line;
+    while (customGetline(csvFile, line)) {
+        vector<String> rowData;
+        String cell;
+        for (int i = 0; line[i] != '\0'; ++i) {
+            if (line[i] == ',') {
+                rowData.push_back(cell);
+                cell.clear();
+            }
+            else {
+                cell += line[i];
+            }
+        }
+        // Add the last cell after the loop
+        rowData.push_back(cell);
+
+        if (columnChoice < rowData.size()) {
+            String key = rowData[columnChoice];
+            // Reconstruct the data row as a single string
+            String dataRow;
+            for (size_t i = 0; i < rowData.size(); ++i) {
+                dataRow += rowData[i];
+                if (i != rowData.size() - 1) {
+                    dataRow += ',';
+                }
+            }
+            tree.insert(key, dataRow);
+        }
+        else {
+            cout << "Row has fewer columns than expected." << endl;
+        }
+    }
+
+    csvFile.close();
+
+    // Optionally, perform in-order traversal to display the tree
+    // tree.inOrder();
+
+    return 0;
+}
+

@@ -147,32 +147,35 @@ public:
 		push_back('\0');
 	}
 
-	void operator+(const char* val) {
+	String operator+(const char* val) {
 		len--;
 		int i = 0;
 		while (val[i++]) {
 			push_back(val[i - 1]);
 		}
 		push_back('\0');
+		return *this;
 	}
 
-	void operator+(char val) {
+	String operator+(char val) {
 		len--;
 		push_back(val);
 		push_back('\0');
+		return *this;
 	}
 
-	void operator+(String val) {
+	String operator+(String val) {
 		len--;
 		int i = 0;
 		while (val[i++]) {
 			push_back(val[i - 1]);
 		}
 		push_back('\0');
+		return *this;
 	}
 
 
-	int isGreaterThan(const String& other) const  // 1 means greater // 2 means less // 3 means equal
+	int isGreaterThan(String other) const  // 1 means greater // 2 means less // 3 means equal
 	{
 		int i = 0;
 		while (data[i] && other.data[i])
