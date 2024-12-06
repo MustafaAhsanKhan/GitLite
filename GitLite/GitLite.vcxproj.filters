@@ -36,7 +36,7 @@
     <ClInclude Include="string2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="merkelTree.h">
+    <ClInclude Include="merkleTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="picosha2.h">

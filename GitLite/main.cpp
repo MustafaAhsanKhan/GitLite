@@ -16,7 +16,7 @@ using namespace std;
 //#include "../GitLite/AVL-Tree.h"
 #include "string2.h"
 #include "BTreeFileSystem.h"
-#include "merkelTree.h"
+#include "merkleTree.h"
 int main()
 {
 	cout << instructorsHash(1523) << endl;
@@ -52,8 +52,8 @@ int main()
 		//cout << "-----------------";
 	//}
 
-	Console C1;
-	C1.run();  // Program Loop
+	//Console C1;
+	//C1.run();  // Program Loop
 	//AVL tree;
 
 	//// Constructing tree given in the 

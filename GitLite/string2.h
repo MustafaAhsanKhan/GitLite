@@ -232,6 +232,16 @@ public:
 		push_back('\0');
 	}
 
+	char* operator+(String& other) {
+		len--;
+		int i = 0;
+		while(other[i++]){
+			push_back(other[i - 1]);
+		}
+		push_back('\0');
+		return getData();
+	}
+
 	friend ostream& operator<<(ostream& os,const  String& text);
 	friend istream& operator>>(istream& in, String& text);
 	friend ofstream& operator<<(ofstream& os, String& text);
