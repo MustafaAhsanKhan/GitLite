@@ -1,4 +1,4 @@
-//#include "Console.h"
+#include "Console.h"
 ////#include "../GitLite/BTreeNode.h"
 //#include <fstream>
 //#include <iostream>
@@ -14,14 +14,30 @@
 #include <iostream>
 using namespace std;
 //#include "../GitLite/AVL-Tree.h"
+#include "string2.h"
 #include "BTreeFileSystem.h"
+#include "merkelTree.h"
 int main()
 {
-	BTree<int, 4> tree("tree");
-	for (int i = 0; i < 10; i++) {
-		tree.insert(i);
+	cout << instructorsHash(1523) << endl;
+	//BTree<int, 4> tree("tree");
+	//for (int i = 0; i < 10000; i++) {
+	//	tree.insert(i);
 
-	}
+
+
+
+
+
+
+	//}
+	
+	//cout << "pappo";
+	/*
+	for (int i = 0; i < 998; i++) {
+		tree.remove(i);
+
+	}*/
 	//BTreeNode<string, 4> node("root.txt");
 
 	//BTree<int, 4> tree("tree\\");
@@ -36,8 +52,8 @@ int main()
 		//cout << "-----------------";
 	//}
 
-	////Console C1;
-	////C1.run();  // Program Loop
+	Console C1;
+	C1.run();  // Program Loop
 	//AVL tree;
 
 	//// Constructing tree given in the 

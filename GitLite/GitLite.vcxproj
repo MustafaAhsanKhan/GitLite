@@ -135,7 +135,9 @@
     <ClInclude Include="BTree.h" />
     <ClInclude Include="BTreeNode.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="merkelTree.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="picosha2.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="string2.h" />
   </ItemGroup>

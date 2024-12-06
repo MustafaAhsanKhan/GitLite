@@ -262,12 +262,12 @@ class BTree {
 
     void removeFromNonLeaf(BTreeNode<T, o>* node, int idx) {
         T k = node->keys[idx];
-        if (new BTreeNode<T, o>(node->children[idx])->numOfKeys >= o / 2) {
+        if ((new BTreeNode<T, o>(node->children[idx]))->numOfKeys >= o / 2) {
             T pred = getPredecessor(node, idx);
             node->keys[idx] = pred;
             remove(new BTreeNode<T, o>(node->children[idx]), pred);
         }
-        else if (new BTreeNode<T, o>(node->children[idx + 1])->numOfKeys >= o / 2) {
+        else if ((new BTreeNode<T, o>(node->children[idx + 1]))->numOfKeys >= o / 2) {
             T succ = getSuccessor(node, idx);
             node->keys[idx] = succ;
             remove(new BTreeNode<T, o>(node->children[idx + 1]), succ);
@@ -320,10 +320,10 @@ class BTree {
     }
 
     void fill(BTreeNode<T, o>* node, int idx) {
-        if (idx != 0 && new BTreeNode<T, o>(node->children[idx - 1])->numOfKeys >= o / 2) {
+        if (idx != 0 && (new BTreeNode<T, o>(node->children[idx - 1]))->numOfKeys >= o / 2) {
             borrowFromPrev(node, idx);
         }
-        else if (idx != node->numOfKeys && new BTreeNode<T, o>(node->children[idx + 1])->numOfKeys >= o / 2) {
+        else if (idx != node->numOfKeys && (new BTreeNode<T, o>(node->children[idx + 1]))->numOfKeys >= o / 2) {
             borrowFromNext(node, idx);
         }
         else {
@@ -401,7 +401,7 @@ class BTree {
                 return;
             }
             bool flag = (idx == node->numOfKeys);
-            if (new BTreeNode<T, o>(node->children[idx])->numOfKeys < o / 2) {
+            if ((new BTreeNode<T, o>(node->children[idx]))->numOfKeys < o / 2) {
                 fill(node, idx);
             }
             if (flag && idx > node->numOfKeys) {
@@ -436,7 +436,9 @@ public:
         //cout << endl;
         //print(root, 0);
     }
-
+    void print() {
+		print(root, 0);
+    }
     void remove(T k) {
         if (!root) {
             cout << "The tree is empty\n";

@@ -14,7 +14,8 @@ istream& operator>>(istream& in, String& text) {
     return in;
 }
 
-ofstream& operator<<(ofstream& os,   String& text) {
+
+ofstream& operator<<(ofstream& os, String& text) {
     os << text.getData();
     return os;
 }

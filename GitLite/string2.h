@@ -224,10 +224,16 @@ public:
 		return true;
 	}
 
+	void getLine(istream& is, char delimiter) {
+		char ch;
+		while (is.get(ch) && ch != delimiter) {
+			push_back(ch);
+		}
+		push_back('\0');
+	}
+
 	friend ostream& operator<<(ostream& os,const  String& text);
 	friend istream& operator>>(istream& in, String& text);
 	friend ofstream& operator<<(ofstream& os, String& text);
 	friend ifstream& operator>>(ifstream& in, String& text);
-	
-
 };
