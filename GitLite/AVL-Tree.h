@@ -5,7 +5,7 @@
 #include <iostream>
 
 using namespace std;
-using namespace filesystem;
+namespace fs = std::filesystem;
 
 // An AVL tree node
 struct Node
@@ -22,23 +22,23 @@ struct Node
     }
 };
 
+
 class AVL {
 private:
-    filesystem::path& filePath
+    fs::path rootFileName;
     int nodeCount;
 
-    // Helper functions
     String generateFileName(String key)
     {
-        return key + "_" + char(nodeCount++) + ".txt";
+        String fileName = key + ' ' + to_string(nodeCount++) + ".txt";
+        return fileName;
     }
 
     // Modify insert and delete functions to work with filenames
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
-    void customGetline(ifstream& file, String& line, char delimiter = '\n')
-    {
+    void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
         char ch;
         while (file.get(ch)) {
             if (ch == delimiter) {
@@ -48,11 +48,9 @@ public:
         }
     }
 
-    Node readNodeFromFile(const filesystem::path& filePath)
-    {
-        ifstream nodeFile(filePath);
-        if (!nodeFile.is_open())
-        {
+    Node readNodeFromFile(const fs::path& filePath) {
+        std::ifstream nodeFile(filePath);
+        if (!nodeFile.is_open()) {
             String empty_str("");
             // Handle file not found
             return Node(empty_str, 0, 0, empty_str, empty_str, empty_str);
@@ -76,14 +74,13 @@ public:
         return Node(key, isLeaf, balanceFactor, leftFile, rightFile, dataRow);
     }
 
-    void writeNodeToFile(const Node& node, const String& fileName)
-    {
-        ofstream nodeFile(fileName.getData());
-        nodeFile << node.key << endl;
-        nodeFile << node.isLeaf << endl;
-        nodeFile << node.balanceFactor << endl;
-        nodeFile << node.leftFile << endl;
-        nodeFile << node.rightFile << endl;
+    void writeNodeToFile(const Node& node, const fs::path& filePath) {
+        std::ofstream nodeFile(filePath);
+        nodeFile << node.key << std::endl;
+        nodeFile << node.isLeaf << std::endl;
+        nodeFile << node.balanceFactor << std::endl;
+        nodeFile << node.leftFile << std::endl;
+        nodeFile << node.rightFile << std::endl;
         nodeFile << node.dataRow; // Write the data row as a single string
         nodeFile.close();
     }
@@ -92,7 +89,7 @@ public:
         rootFileName = insertHelper(rootFileName, key, dataRow);
     }
 
-    String insertHelper(const filesystem::path& nodeFileName, const String& key, const String& dataRow) {
+    fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow) {
         if (nodeFileName.empty()) {
             // Create new node
             String newNodeFile = generateFileName(key);
@@ -121,6 +118,10 @@ public:
         writeNodeToFile(node, nodeFileName);
         return nodeFileName;
     }
+
+    // Other methods...
+};
+
 
     String rightRotate(const String& yFileName) {
         Node y = readNodeFromFile(yFileName);

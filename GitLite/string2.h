@@ -88,6 +88,11 @@ public:
 		}
 		push_back('\0'); // add null character at the end
 	}
+
+	char& operator [](int index) const {
+		return data[index]; // returns data at index
+	}
+
 	void operator+=(char val) {
 		len--;
 		push_back(val); // add val to the array
@@ -142,6 +147,29 @@ public:
 		push_back('\0');
 	}
 
+	void operator+(const char* val) {
+		len--;
+		int i = 0;
+		while (val[i++]) {
+			push_back(val[i - 1]);
+		}
+		push_back('\0');
+	}
+
+	void operator+(char val) {
+		len--;
+		push_back(val);
+		push_back('\0');
+	}
+
+	void operator+(String val) {
+		len--;
+		int i = 0;
+		while (val[i++]) {
+			push_back(val[i - 1]);
+		}
+		push_back('\0');
+	}
 
 
 	int isGreaterThan(const String& other) const  // 1 means greater // 2 means less // 3 means equal
@@ -160,27 +188,6 @@ public:
 	}
 
 
-	void removePunctuationMarks() { // remove everything except alphabets and spaces
-		int j = 0;
-		for (int i = 0; data[i]; i++, j++) {
-			if (!(data[i] < 65 || (data[i] > 90 && data[i] < 97) || data[i] > 122) || data[i] == ' ') {
-				data[i] = data[i];
-			}
-			else {
-				data[i] = ' ';
-			}
-		}
-		len = j;
-		push_back('\0');
-
-	}
-	void toLower() {
-		for (int i = 0; i < len; i++) {
-			if (data[i] >= 65 && data[i] <= 90) {
-				data[i] += 32;
-			}
-		}
-	}
 	int search(String text) { // returns the index of the subStringing
 		int i = 0;
 		while (data[i]) {
@@ -195,32 +202,13 @@ public:
 		}
 		return -1;
 	}
-	void removeWord(String text) {
-		int index = search(text);
-		while (index != -1) {
-			for (int k = index; data[k]; k++) data[k] = data[k + text.size()]; // copy Stringing after word
-			len -= text.size();
-			index = search(text);
-		}
-	}
-	void removeExtraSpaces() {
-		int start = 0, end = len - 2;
+
+	void toLower() { // convert all characters to lower case
 		int i = 0;
-		while (data[start] == ' ') start++; // get index after spaces from start
-		while (data[end] == ' ') end--; // get index before spaces from end
-		len = 0;
-		bool spaceFound = false;
-		for (int i = start; i <= end; i++) { // copy remaining Stringing
-			if (data[i] != ' ') { // copy without spaces
-				push_back(data[i]);
-				spaceFound = false;
-			}
-			else if (!spaceFound) { // first space
-				push_back(data[i]);
-				spaceFound = true;
-			}
+		while (data[i]) {
+			if (data[i] >= 'A' && data[i] <= 'Z') data[i] += 32;
+			i++;
 		}
-		push_back('\0');
 	}
 	bool operator==(const char* text) { // check character by character
 		int i = 0;
