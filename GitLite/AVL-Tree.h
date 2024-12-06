@@ -146,53 +146,54 @@ public:
 
         Node node = readNodeFromFile(nodeFileName);
 
-        // In your insertHelper function, before assigning child files:
-        if (node.leftFile.getData() == nodeFileName) { node.leftFile = ""; }
-        if (node.rightFile.getData() == nodeFileName) { node.rightFile = ""; }
-
         if (key.isGreaterThan(node.key) == 2) {
-            node.leftFile = insertHelper(node.leftFile.getData(), key, dataRow).string();
+            fs::path updatedLeftChild = insertHelper(node.leftFile.getData(), key, dataRow);
+            node.leftFile = updatedLeftChild.string();
         }
         else if (key.isGreaterThan(node.key) == 1) {
-            node.rightFile = insertHelper(node.rightFile.getData(), key, dataRow).string();
+            fs::path updatedRightChild = insertHelper(node.rightFile.getData(), key, dataRow);
+            node.rightFile = updatedRightChild.string();
         }
         else {
             // Duplicate keys are not allowed
             return nodeFileName;
         }
 
-        node.isLeaf = 0; // Node now has a child, so it's not a leaf
+        node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
 
-        // Update heights and balance factors
-        updateHeight(nodeFileName);
+        // Update balance factor
         updateBalanceFactor(nodeFileName);
 
-        // Perform rotations if necessary
         int balance = getBalanceFactor(nodeFileName);
 
         // Left Left Case
-        if (balance > 1 && key.isGreaterThan(node.leftFile) == 2)
+        if (balance > 1 && key.isGreaterThan(readNodeFromFile(node.leftFile.getData()).key) == 2) {
             return rightRotate(nodeFileName);
+        }
 
         // Right Right Case
-        if (balance < -1 && key.isGreaterThan(node.rightFile) == 1)
+        if (balance < -1 && key.isGreaterThan(readNodeFromFile(node.rightFile.getData()).key) == 1) {
             return leftRotate(nodeFileName);
+        }
 
         // Left Right Case
-        if (balance > 1 && key.isGreaterThan(node.leftFile) == 1) {
+        if (balance > 1 && key.isGreaterThan(readNodeFromFile(node.leftFile.getData()).key) == 1) {
             node.leftFile = leftRotate(node.leftFile.getData()).string();
+            writeNodeToFile(node, nodeFileName); // Update node after rotation
             return rightRotate(nodeFileName);
         }
 
         // Right Left Case
-        if (balance < -1 && key.isGreaterThan(node.rightFile) == 2) {
+        if (balance < -1 && key.isGreaterThan(readNodeFromFile(node.rightFile.getData()).key) == 2) {
             node.rightFile = rightRotate(node.rightFile.getData()).string();
+            writeNodeToFile(node, nodeFileName); // Update node after rotation
             return leftRotate(nodeFileName);
         }
 
         writeNodeToFile(node, nodeFileName);
         return nodeFileName;
     }
+
 
     void updateHeight(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return;
