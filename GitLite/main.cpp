@@ -14,19 +14,27 @@
 #include <iostream>
 using namespace std;
 //#include "../GitLite/AVL-Tree.h"
-#include "BTree.h"
+#include "BTreeFileSystem.h"
 int main()
 {
-	BTree<int, 4> tree;
-	for (int i = 1; i <=124; i++) {
+	BTree<int, 4> tree("tree");
+	for (int i = 0; i < 10; i++) {
 		tree.insert(i);
-		cout << "-----------------";
-	}
 
-	for (int i = 1; i <= 124; i++) {
-		tree.remove(i);
-		cout << "-----------------";
 	}
+	//BTreeNode<string, 4> node("root.txt");
+
+	//BTree<int, 4> tree("tree\\");
+	//for (int i = 1; i <=10; i++) {
+		//tree.insert(i);
+		//tree.print();
+		//cout << "-----------------";
+	//}
+
+	//for (int i = 1; i <= 124; i++) {
+		//tree.remove(i);
+		//cout << "-----------------";
+	//}
 
 	////Console C1;
 	////C1.run();  // Program Loop
