@@ -369,6 +369,10 @@ template <typename InContainer>
 std::string hash256_hex_string(const InContainer& src) {
     return hash256_hex_string(src.begin(), src.end());
 }
+
+std::string hash256_hex_string(char* data) {
+	return hash256_hex_string(data, data + std::char_traits<char>::length(data));
+}
 template<typename OutIter>void hash256(std::ifstream& f, OutIter first, OutIter last){
     hash256(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), first,last);
 

@@ -1,5 +1,6 @@
 #pragma once
 #include<iostream>
+#include<fstream>
 using namespace std;
 template <typename T>
 class Vector
@@ -118,6 +119,14 @@ public:
 		}
 		push_back('\0');
 	}
+	//void operator=(string text) {
+	//	len = 0;
+	//	int i = 0;
+	//	while (text[i++]) {
+	//		push_back(text[i - 1]);
+	//	}
+	//	push_back('\0');
+	//}
 	void operator=(String text) {
 		len = 0;
 		int i = 0;
@@ -224,7 +233,7 @@ public:
 		return true;
 	}
 
-	void getLine(istream& is, char delimiter) {
+	void getLine(ifstream& is, char delimiter) {
 		char ch;
 		while (is.get(ch) && ch != delimiter) {
 			push_back(ch);
@@ -232,6 +241,15 @@ public:
 		push_back('\0');
 	}
 
+	void readComplete(ifstream& ifs) {
+		len = 0;
+		char ch;
+		while (ifs.get(ch)) {
+			if (ch != '\n')	push_back(ch);
+			else push_back(' ');
+		}
+		push_back('\0');
+	}
 	char* operator+(String& other) {
 		len--;
 		int i = 0;

@@ -4,19 +4,32 @@
 #include "picosha2.h"
 #include "Vector"
 #include<filesystem>
+#include "queue.h"
 using namespace filesystem;
-void instructorsHash(ifstream& ifs, path out) {
+void instructorsHash(path in, path out) {
 	char ch;
 	int hash = 1;
+	ifstream ifs(in);
 	while (ifs.get(ch)) {
 		if (ch != '\n' && ch != ' ') {
 			hash *= ch % 29;
 		}
 	}
+	ifs.close();
 	ofstream file(out);
-	file << hash;
+	file << 0 << " " << hash << " " << out << " " << in << " " << " " << " ";
 	file.close();
-	//return hash%29;
+}
+void sha256Hash(path in, path out) {
+	String data;
+	ifstream ifs(in);
+	data.readComplete(ifs);
+	ifs.close();
+	String hash;
+	hash = picosha2::hash256_hex_string(data.getData());
+	ofstream file(out);
+	file << 1 << " " << hash << " " << out << " " << in << " " << " " << " ";
+	file.close();
 }
 int instructorsHash(String& str) {
 	int hash = 1;
@@ -38,8 +51,10 @@ struct MerkleNode {
 	String hash;
 	MerkleNode* left;
 	MerkleNode* right;
+	path dataNodePath;
 	path nodePath;
-	int hashPref; // 1 for instructor 2 for sha256
+	int hashPref; // 0 for instructor 1 for sha256
+	
 	MerkleNode(String hash) {
 		this->hash = hash;
 		left = right = nullptr;
@@ -56,15 +71,24 @@ struct MerkleNode {
 	}
 	void writeNode() {
 		ofstream file(nodePath);
-		file << hash;
-		if (left) cout << left->nodePath << endl;
-		else cout << endl;
-		if (right) cout << right->nodePath;
-		else cout << endl;
+		file << hashPref << " ";
+		file << hash<<" ";
+		file << nodePath << " ";
+		if (dataNodePath != "") file << dataNodePath << " ";
+		else file << "  ";
+		if (left) file << left->nodePath << " ";
+		else file << "  ";
+		if (right) file << right->nodePath;
+		else file << "  ";
 	}
 	void readNode() {
 		ifstream file(nodePath);
-		file >> hash;
+		file >> hashPref;
+		char sp;
+		file.get(sp);
+		hash.getLine(file, ' ');
+		file >> nodePath;
+		file >> dataNodePath;
 		path leftPath;
 		file >> leftPath;
 		if (leftPath != "") {
@@ -79,14 +103,54 @@ struct MerkleNode {
 			right->nodePath = rightPath;
 			right->readNode();
 		}
+		file.close();
 	}
+	
 };
 
-
+MerkleNode*& generateMerkleNodeFromFile(path filepath, path out, int hpref) {
+	if (hpref) sha256Hash(filepath, out);
+	else instructorsHash(filepath, out);
+	MerkleNode* node = new MerkleNode(out);
+	return node;
+}
 
 class MerkleTree {
-	MerkleNode root;
+	MerkleNode* root;
+	int hpref;
+	queue<MerkleNode*> nodes;
+	int currentNodeIndex = 0;
 public:
-	
+	MerkleTree(int hpref) {
+		this->hpref = hpref;
+	}
+	void generateFromFolder(path folderPath) {
+		path fol = "merkle";
+		if (!exists(folderPath)) return;
+		for (const auto& file : directory_iterator(folderPath)) {
+			if (!is_directory(file)) {
+				path out = fol / (to_string(currentNodeIndex)+".txt");
+				MerkleNode* node = generateMerkleNodeFromFile(file.path(), out, hpref);
+				node->dataNodePath = file.path();
+				nodes.push(node);
+				currentNodeIndex++;
+			}
+		}
+		while (nodes.size() > 1) {
+			MerkleNode* left = nodes.front();
+			nodes.pop();
+			MerkleNode* right = nodes.front();
+			nodes.pop();
+			path out = fol / (to_string(currentNodeIndex)+".txt");
+			MerkleNode* node = new MerkleNode(left, right);
+			
+			node->nodePath = out;
+			nodes.push(node);
+			node->writeNode();
+			currentNodeIndex++;
+		}
+		root = nodes.front();
+	}
+	Vector<Vector<path>> getChangedFiles()
 	
 };
