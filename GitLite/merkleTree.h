@@ -55,7 +55,7 @@ struct MerkleNode {
 	path dataNodePath;
 	path nodePath;
 	int hashPref; // 0 for instructor 1 for sha256
-
+	MerkleNode() {	}
 	MerkleNode(String hash) {
 		this->hash = hash;
 		left = right = nullptr;
@@ -99,7 +99,7 @@ struct MerkleNode {
 				path leftPath;
 				file >> leftPath;
 				if (leftPath != "") {
-					left = new MerkleNode(leftPath);
+					left = new MerkleNode();
 					left->nodePath = leftPath;
 					//left->readNode();
 				}
@@ -110,7 +110,7 @@ struct MerkleNode {
 				path rightPath;
 				file >> rightPath;
 				if (rightPath != "") {
-					right = new MerkleNode(rightPath);
+					right = new MerkleNode();
 					right->nodePath = rightPath;
 					//right->readNode();
 				}
@@ -170,8 +170,49 @@ public:
 		Vector<Vector<path>> changedFiles;
 		MerkleNode* root1 = new MerkleNode(branch1);
 		MerkleNode* root2 = new MerkleNode(branch2);
-		Queue <Vector< MerkleNode* >> q1;
-
+		if (root1->hash == root2->hash) return changedFiles;
+		Vector<MerkleNode*> nodes;
+		nodes.push_back(root1);
+		nodes.push_back(root2);
+		cout << nodes[0]->hash << " " << nodes[1]->hash << endl;
+		Queue <Vector< MerkleNode* >> q;
+		q.push(nodes);
+		//nodes.clear();
+		while (!q.empty()) {
+			Vector<MerkleNode*> currentNodes = q.pop();
+			Vector<MerkleNode*> nextNodes;
+			cout << currentNodes[0]->hash << " " << currentNodes[1]->hash << endl;
+			currentNodes[0]->readNode();
+			currentNodes[1]->readNode();
+			cout << currentNodes[0]->hash << " " << currentNodes[1]->hash << endl;
+			cout << endl;
+			if (currentNodes[0]->hash != currentNodes[1]->hash) {
+				if (currentNodes[0]->isLeaf && currentNodes[1]->isLeaf) {
+					Vector<path> temp;
+					temp.push_back(currentNodes[0]->dataNodePath);
+					temp.push_back(currentNodes[1]->dataNodePath);
+					changedFiles.push_back(temp);
+				}
+				else {
+					if (currentNodes[0]->left && currentNodes[1]->left) {
+						Vector<MerkleNode*> temp;
+						temp.push_back(currentNodes[0]->left);
+						temp.push_back(currentNodes[1]->left);
+						q.push(temp);
+					}
+					if (currentNodes[0]->right && currentNodes[1]->right) {
+						Vector<MerkleNode*> temp;
+						temp.push_back(currentNodes[0]->right);
+						temp.push_back(currentNodes[1]->right);
+						q.push(temp);
+					}
+				}
+			}
+		}
+		for (int i = 0; i < changedFiles.size(); i++) {
+			cout << changedFiles[i][0] << " " << changedFiles[i][1] << endl;
+		}
+		return changedFiles;
 	};
 
 };

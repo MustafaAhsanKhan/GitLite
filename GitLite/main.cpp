@@ -21,6 +21,8 @@ int main()
 {
 	//MerkleTree tree(1);
 	//tree.generateFromFolder("tree");
+	MerkleTree::getChangedFiles("merkle\\14.txt", "merkle2\\14.txt");
+
 	//BTree<int, 4> tree("tree");
 	//for (int i = 0; i < 10000; i++) {
 	//	tree.insert(i);

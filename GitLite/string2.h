@@ -12,7 +12,7 @@ protected:
 public:
 	Vector() {
 		len = 0;
-		max = 1;
+		max = 2;
 		data = new T[max]();
 	}
 	Vector(int len) {
@@ -47,7 +47,7 @@ public:
 	}
 	void clear() { // clear the array
 		len = 0;
-		data = new T[max]();
+		//data = new T[max]();
 	}
 	T* getDup() { // get a duplicate of the array
 		T* dup = new T[len];
@@ -231,6 +231,9 @@ public:
 		}
 		if (data[i] || text[i]) return false;
 		return true;
+	}
+	bool operator!=(String text) {
+		return !(*this == text);
 	}
 
 	void getLine(ifstream& is, char delimiter) {

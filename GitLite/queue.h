@@ -49,6 +49,9 @@ public:
 	int size() {
 		return len;
 	}
+	bool empty() {
+		return len == 0;
+	}
 	T p() {
 		if (front == nullptr) {
 			return T(-1);
