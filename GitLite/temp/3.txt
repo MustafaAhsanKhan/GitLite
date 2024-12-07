@@ -1,6 +1,7 @@
-21
+28
+1
 0
-2
-temp\4.txt
-temp\1.txt
-edwArD EDWaRDs,21,Female,AB-,Diabetes,2020-11-03,Kelly Olson,Group Middleton,Medicare,19580.87234486093,389,Emergency,2020-11-15,Paracetamol,Inconclusive
+0
+
+
+andrEw waTtS,28,Female,O+,Diabetes,2020-11-18,Kevin Wells,"Hernandez Rogers and Vang,",Medicare,37909.78240987528,450,Elective,2020-12-18,Ibuprofen,Abnormal

@@ -1,6 +1,7 @@
-43
+76
 0
-2
-temp\3.txt
-temp\0.txt
-adrIENNE bEll,43,Female,AB+,Cancer,2022-09-19,Kathleen Hanna,White-White,Aetna,14238.317813937623,458,Urgent,2022-10-09,Penicillin,Abnormal
+1
+0
+temp\1.txt
+temp\8.txt
+DaNnY sMitH,76,Female,A-,Obesity,2022-09-22,Tiffany Mitchell,Cook PLC,Aetna,27955.096078842456,205,Emergency,2022-10-07,Aspirin,Normal

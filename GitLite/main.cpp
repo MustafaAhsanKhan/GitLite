@@ -112,6 +112,9 @@ int main() {
         }
     }
 
+	// In-order traversal to write the tree to a file
+	tree.inOrder();
+
     csvFile.close();
 
     // Optionally, perform in-order traversal to display the tree
