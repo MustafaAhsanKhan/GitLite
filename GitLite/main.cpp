@@ -1,5 +1,6 @@
 #include "string2.h"
 #include "AVL-Tree.h"
+#include "RB-Tree.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -49,8 +50,6 @@ int main() {
     for (int i = 0; headerLine[i] != '\0'; i++) {
         if (headerLine[i] == ',') {
             headers.push_back(header);
-            cout << header;
-            cout << endl;
             header.clear();
         }
         else {

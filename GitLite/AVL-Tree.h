@@ -8,7 +8,6 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-// Custom to_string function for String class
 String custom_to_string(int value) {
     String result;
     bool isNegative = false;
@@ -37,29 +36,26 @@ String custom_to_string(int value) {
         result[i] = result[len - i - 1];
         result[len - i - 1] = temp;
     }
-    // cout << "CUSTOM TO STRING " << result << endl; // Debugging line
 
     return result;
 }
 
-// An AVL tree node with parentFile added
-struct Node {
+// An AVL tree node
+struct Node
+{
     String key;
     int isLeaf;
     int height;
     int balanceFactor;
     String leftFile;
     String rightFile;
-    String parentFile; // New member for parent file path
-    String dataRow;    // Store the data row in a single String
+    String dataRow; // Store the data row in a single String
 
-    Node(const String& k = "", int leaf = 1, int hgt = 0, int balance = 0,
-        const String& left = "", const String& right = "", const String& parent = "",
-        const String& data = "")
-        : key(k), isLeaf(leaf), height(hgt), balanceFactor(balance),
-        leftFile(left), rightFile(right), parentFile(parent), dataRow(data) {
+    Node(const String& k, int leaf, int hgt, int balance, const String& left, const String& right, const String& data)
+        : key(k), isLeaf(leaf), height(hgt), balanceFactor(balance), leftFile(left), rightFile(right), dataRow(data) {
     }
 };
+
 
 class AVL {
 private:
@@ -74,11 +70,14 @@ private:
         }
     }
 
-    fs::path generateFileName() {
-        String fileName = custom_to_string(nodeCount++) + ".txt";
+    fs::path generateFileName(String key)
+    {
+        String temp = "";
+        String fileName = temp + to_string(nodeCount++) + ".txt";
         return (directoryPath / fileName.getData());
     }
 
+    // Modify insert and delete functions to work with filenames
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
@@ -86,7 +85,6 @@ public:
         createDirectory(dirName);
     }
 
-    // Custom getline function
     void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
         line.clear();
         char ch;
@@ -96,18 +94,17 @@ public:
             }
             line += ch;
         }
-        // No need to add null terminator; String class handles it
+        line.push_back('\0');
     }
 
-    // Read a node from file including parentFile
     Node readNodeFromFile(const fs::path& filePath) {
         std::ifstream nodeFile(filePath);
         if (!nodeFile.is_open()) {
             // Return a node indicating that it doesn't exist
-            return Node();
+            return Node("", 0, -1, 0, "", "", "");
         }
 
-        String key, leftFile, rightFile, parentFile, dataRow;
+        String key, leftFile, rightFile, dataRow;
         int isLeaf, height, balanceFactor;
 
         customGetline(nodeFile, key);
@@ -117,15 +114,16 @@ public:
         nodeFile.ignore(); // Ignore the newline after balanceFactor
         customGetline(nodeFile, leftFile);
         customGetline(nodeFile, rightFile);
-        customGetline(nodeFile, parentFile);
+
         customGetline(nodeFile, dataRow); // Read the data row as a single string
+        dataRow += "\n";
 
         nodeFile.close();
 
-        return Node(key, isLeaf, height, balanceFactor, leftFile, rightFile, parentFile, dataRow);
+        return Node(key, isLeaf, height, balanceFactor, leftFile, rightFile, dataRow);
     }
 
-    // Write a node to file including parentFile
+
     void writeNodeToFile(const Node& node, const fs::path& filePath) {
         std::ofstream nodeFile(filePath);
         nodeFile << node.key << '\n';
@@ -134,54 +132,39 @@ public:
         nodeFile << node.balanceFactor << '\n';
         nodeFile << node.leftFile << '\n';
         nodeFile << node.rightFile << '\n';
-        nodeFile << node.parentFile << '\n';
-        nodeFile << node.dataRow;
+        nodeFile << node.dataRow; // No extra newline here
         nodeFile.close();
     }
 
-    // Update parent links in child nodes
-    void updateParentInChild(const String& childFileName, const String& parentFileName) {
-        if (childFileName.empty()) return;
-        Node childNode = readNodeFromFile(childFileName.getData());
-        childNode.parentFile = parentFileName;
-        writeNodeToFile(childNode, childFileName.getData());
-    }
 
     void insert(const String& key, const String& dataRow) {
-        rootFileName = insertHelper(rootFileName, key, dataRow, "");
+        rootFileName = insertHelper(rootFileName, key, dataRow);
     }
 
-    fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow, const String& parentFileName) {
+    fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow) {
         if (nodeFileName.empty()) {
             // Create new node with height 0
-            fs::path newNodeFile = generateFileName();
-            Node newNode(key, 1, 0, 0, "", "", parentFileName, dataRow);
+            fs::path newNodeFile = generateFileName(key);
+            Node newNode(key, 1, 0, 0, "", "", dataRow);
             writeNodeToFile(newNode, newNodeFile);
             return newNodeFile;
         }
 
-
         Node node = readNodeFromFile(nodeFileName);
 
         if (key.isGreaterThan(node.key) == 2) {  // Less
-            fs::path updatedLeftChild = insertHelper(node.leftFile.getData(), key, dataRow, nodeFileName.string());
+            fs::path updatedLeftChild = insertHelper(node.leftFile.getData(), key, dataRow);
             node.leftFile = updatedLeftChild.string();
-
-            // Update parent link in left child
-            updateParentInChild(node.leftFile, nodeFileName.string());
         }
         else {
             // Insert duplicates to the right subtree (greater or equal cases)
-            fs::path updatedRightChild = insertHelper(node.rightFile.getData(), key, dataRow, nodeFileName.string());
+            fs::path updatedRightChild = insertHelper(node.rightFile.getData(), key, dataRow);
             node.rightFile = updatedRightChild.string();
-
-            // Update parent link in right child
-            updateParentInChild(node.rightFile, nodeFileName.string());
         }
 
         node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
 
-        // Write the updated node back to file
+        // **Immediately write the updated node back to file**
         writeNodeToFile(node, nodeFileName);
 
         // Update balance factor
@@ -206,10 +189,6 @@ public:
         if (balance > 1 && key.isGreaterThan(readNodeFromFile(node.leftFile.getData()).key) != 2) {
             node.leftFile = leftRotate(node.leftFile.getData()).string();
             writeNodeToFile(node, nodeFileName); // Update node after rotation
-
-            // Update parent link in left child
-            updateParentInChild(node.leftFile, nodeFileName.string());
-
             return rightRotate(nodeFileName);
         }
 
@@ -217,16 +196,27 @@ public:
         if (balance < -1 && key.isGreaterThan(readNodeFromFile(node.rightFile.getData()).key) == 2) {
             node.rightFile = rightRotate(node.rightFile.getData()).string();
             writeNodeToFile(node, nodeFileName); // Update node after rotation
-
-            // Update parent link in right child
-            updateParentInChild(node.rightFile, nodeFileName.string());
-
             return leftRotate(nodeFileName);
         }
 
         writeNodeToFile(node, nodeFileName);
         return nodeFileName;
     }
+
+
+
+    /*void updateHeight(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return;
+
+        Node node = readNodeFromFile(nodeFileName);
+
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+        node.height = 1 + max(leftHeight, rightHeight);
+
+        writeNodeToFile(node, nodeFileName);
+    }*/
+
 
     void updateBalanceFactor(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return;
@@ -239,12 +229,12 @@ public:
         // Compute balance factor
         node.balanceFactor = leftHeight - rightHeight;
 
-        // Update node's height
-        node.height = 1 + max(leftHeight, rightHeight);
-
-        // Write the updated node back to the file
+        // **Write the updated node back to the file**
         writeNodeToFile(node, nodeFileName);
     }
+
+
+
 
     fs::path rightRotate(const fs::path& yFileName) {
         Node y = readNodeFromFile(yFileName);
@@ -256,25 +246,25 @@ public:
         x.rightFile = yFileName.string();
         y.leftFile = T2FileName.string();
 
-        // Update parent pointers
-        x.parentFile = y.parentFile;
-        y.parentFile = xFileName.string();
+        // Update `isLeaf` flags
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
 
-        // Update parent link for T2, if it exists
-        if (!T2FileName.empty()) {
-            updateParentInChild(T2FileName.string(), yFileName.string());
-        }
-
-        // Write updated nodes back to files
+        // Write updates back to files
         writeNodeToFile(y, yFileName);
         writeNodeToFile(x, xFileName);
 
-        // Update heights and balance factors
+        // Update heights and balance factors recursively
+        getHeight(yFileName);
         updateBalanceFactor(yFileName);
+        getHeight(xFileName);
         updateBalanceFactor(xFileName);
 
         return xFileName; // New root after rotation
     }
+
+
+
 
     fs::path leftRotate(const fs::path& xFileName) {
         Node x = readNodeFromFile(xFileName);
@@ -286,25 +276,25 @@ public:
         y.leftFile = xFileName.string();
         x.rightFile = T2FileName.string();
 
-        // Update parent pointers
-        y.parentFile = x.parentFile;
-        x.parentFile = yFileName.string();
-
-        // Update parent link for T2, if it exists
-        if (!T2FileName.empty()) {
-            updateParentInChild(T2FileName.string(), xFileName.string());
-        }
+        // Update `isLeaf` flags
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
 
         // Write updated nodes back to files
         writeNodeToFile(x, xFileName);
         writeNodeToFile(y, yFileName);
 
-        // Update heights and balance factors
+        // Update heights and balance factors recursively
+        getHeight(xFileName);
         updateBalanceFactor(xFileName);
+        getHeight(yFileName);
         updateBalanceFactor(yFileName);
 
         return yFileName; // New root after rotation
     }
+
+
+
 
     int getHeight(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) {
@@ -313,8 +303,25 @@ public:
 
         Node node = readNodeFromFile(nodeFileName);
 
-        // Return already computed height
+        // Recursively get heights of left and right children
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+
+        // Compute current node's height
+        node.height = 1 + std::max(leftHeight, rightHeight);
+
+        // Write the updated node back to the file
+        writeNodeToFile(node, nodeFileName);
+
         return node.height;
+    }
+
+
+
+    int getBalanceFactor(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return 0;
+        Node node = readNodeFromFile(nodeFileName);
+        return getHeight(node.leftFile.getData()) - getHeight(node.rightFile.getData());
     }
 
     void inOrderTraversal(const fs::path& nodeFileName) {
@@ -322,14 +329,14 @@ public:
 
         Node node = readNodeFromFile(nodeFileName);
         inOrderTraversal(node.leftFile.getData());
-        std::cout << "Key: " << node.key
-            << ", Height: " << node.height
-            << ", Balance Factor: " << node.balanceFactor
-            << ", Parent File: " << node.parentFile << std::endl;
+        std::cout << "Key: " << node.key << ", Height: " << node.height << ", Balance Factor: " << node.balanceFactor << std::endl;
         inOrderTraversal(node.rightFile.getData());
     }
 
     void inOrder() {
         inOrderTraversal(rootFileName);
     }
+
+
 };
+
