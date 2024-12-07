@@ -23,7 +23,7 @@ bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
 }
 
 int main() {
-    AVL tree;
+    RBTree tree;
     String csvFileName;
     cout << "Enter the CSV file name (with extension): ";
     cin >> csvFileName;

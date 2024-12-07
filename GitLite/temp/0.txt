@@ -1,0 +1,7 @@
+30
+0
+1
+1
+temp\3.txt
+
+Bobby JacksOn,30,Male,B-,Cancer,2024-01-31,Matthew Smith,Sons and Miller,Blue Cross,18856.281305978155,328,Urgent,2024-02-02,Paracetamol,Normal

@@ -8,37 +8,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-String custom_to_string(int value) {
-    String result;
-    bool isNegative = false;
-
-    // Handle negative numbers
-    if (value < 0) {
-        isNegative = true;
-        value = -value;
-    }
-
-    // Convert integer to string
-    do {
-        result += (value % 10) + '0';
-        value /= 10;
-    } while (value > 0);
-
-    // Add negative sign if necessary
-    if (isNegative) {
-        result += '-';
-    }
-
-    // Reverse the string since the digits are added in reverse order
-    int len = result.size();
-    for (int i = 0; i < len / 2; ++i) {
-        char temp = result[i];
-        result[i] = result[len - i - 1];
-        result[len - i - 1] = temp;
-    }
-
-    return result;
-}
+String custom_to_string(int value);
 
 // An AVL tree node
 struct Node

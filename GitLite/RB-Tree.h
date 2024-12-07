@@ -9,7 +9,37 @@ using namespace std;
 namespace fs = std::filesystem;
 
 // Custom to_string function for String class
-String custom_to_string(int value);
+String custom_to_string(int value) {
+    String result;
+    bool isNegative = false;
+
+    // Handle negative numbers
+    if (value < 0) {
+        isNegative = true;
+        value = -value;
+    }
+
+    // Convert integer to string
+    do {
+        result += (value % 10) + '0';
+        value /= 10;
+    } while (value > 0);
+
+    // Add negative sign if necessary
+    if (isNegative) {
+        result += '-';
+    }
+
+    // Reverse the string since the digits are added in reverse order
+    int len = result.size();
+    for (int i = 0; i < len / 2; ++i) {
+        char temp = result[i];
+        result[i] = result[len - i - 1];
+        result[len - i - 1] = temp;
+    }
+
+    return result;
+}
 
 // Red-Black Tree node stored in a file
 struct RBNode {
@@ -36,6 +66,7 @@ private:
 
     void createDirectory(const String& dirName) {
         directoryPath = fs::path(dirName.getData());
+        std::cout << "Creating directory: " << directoryPath << std::endl; // Debugging line
         if (!fs::exists(directoryPath)) {
             fs::create_directory(directoryPath);
         }
@@ -43,6 +74,7 @@ private:
 
     fs::path generateFileName() {
         String fileName = custom_to_string(nodeCount++) + ".txt";
+        std::cout << "Generated file name: " << fileName << std::endl; // Debugging line
         return (directoryPath / fileName.getData());
     }
 
@@ -60,8 +92,10 @@ private:
 
     // Read RBNode from file
     RBNode readNodeFromFile(const fs::path& filePath) {
+        std::cout << "Reading node from file: " << filePath << std::endl; // Debugging line
         std::ifstream nodeFile(filePath);
         if (!nodeFile.is_open()) {
+            std::cerr << "Failed to open file for reading: " << filePath << std::endl; // Debugging line
             // Return a default node indicating it doesn't exist
             return RBNode();
         }
@@ -82,7 +116,12 @@ private:
 
     // Write RBNode to file
     void writeNodeToFile(const RBNode& node, const fs::path& filePath) {
+        std::cout << "Writing node to file: " << filePath << std::endl; // Debugging line
         std::ofstream nodeFile(filePath);
+        if (!nodeFile.is_open()) {
+            std::cerr << "Failed to open file for writing: " << filePath << std::endl; // Debugging line
+            return;
+        }
         nodeFile << node.key << '\n';
         nodeFile << node.color << '\n';
         nodeFile << node.leftFile << '\n';
@@ -301,6 +340,7 @@ public:
     }
 
     void insert(const String& key, const String& dataRow) {
+        std::cout << "Inserting key: " << key << ", dataRow: " << dataRow << std::endl; // Debugging line
         rootFileName = insertHelper(rootFileName, key, dataRow, "");
         fixInsert(rootFileName);
     }
@@ -320,3 +360,4 @@ public:
         inOrderTraversal(rootFileName);
     }
 };
+
