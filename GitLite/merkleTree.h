@@ -17,7 +17,7 @@ void instructorsHash(path in, path out) {
 	}
 	ifs.close();
 	ofstream file(out);
-	file << 0 << " " << hash << " " << out << " " << in << " " << " " << " ";
+	file << hash << " " << 0 << " " << 1 << " " << out << " " << in << " " << " " << " ";
 	file.close();
 }
 void sha256Hash(path in, path out) {
@@ -28,7 +28,7 @@ void sha256Hash(path in, path out) {
 	String hash;
 	hash = picosha2::hash256_hex_string(data.getData());
 	ofstream file(out);
-	file << 1 << " " << hash << " " << out << " " << in << " " << " " << " ";
+	file << hash << " " << 1 << " " << 1 << " " << out << " " << in << " " << " " << " ";
 	file.close();
 }
 int instructorsHash(String& str) {
@@ -49,19 +49,20 @@ int instructorsHash(int num) {
 
 struct MerkleNode {
 	String hash;
+	int isLeaf=0;
 	MerkleNode* left;
 	MerkleNode* right;
 	path dataNodePath;
 	path nodePath;
 	int hashPref; // 0 for instructor 1 for sha256
-	
+
 	MerkleNode(String hash) {
 		this->hash = hash;
 		left = right = nullptr;
 	}
 	MerkleNode(MerkleNode* left, MerkleNode* right) {
 		this->hash = picosha2::hash256_hex_string(left->hash + right->hash);
-
+		this->hashPref = left->hashPref;
 		this->left = left;
 		this->right = right;
 	}
@@ -71,47 +72,61 @@ struct MerkleNode {
 	}
 	void writeNode() {
 		ofstream file(nodePath);
+		file << hash << " ";
 		file << hashPref << " ";
-		file << hash<<" ";
+		file << isLeaf<<" ";
 		file << nodePath << " ";
-		if (dataNodePath != "") file << dataNodePath << " ";
-		else file << "  ";
-		if (left) file << left->nodePath << " ";
-		else file << "  ";
-		if (right) file << right->nodePath;
-		else file << "  ";
-	}
-	void readNode() {
-		ifstream file(nodePath);
-		file >> hashPref;
-		char sp;
-		file.get(sp);
-		hash.getLine(file, ' ');
-		file >> nodePath;
-		file >> dataNodePath;
-		path leftPath;
-		file >> leftPath;
-		if (leftPath != "") {
-			left = new MerkleNode(leftPath);
-			left->nodePath = leftPath;
-			left->readNode();
-		}
-		path rightPath;
-		file >> rightPath;
-		if (rightPath != "") {
-			right = new MerkleNode(rightPath);
-			right->nodePath = rightPath;
-			right->readNode();
+		if (isLeaf) file << dataNodePath << " ";
+		else {
+			if (left) file << 1 << " " << left->nodePath << " ";
+			else file << 0 << " ";
+			if (right) file << 1 << " " << right->nodePath << " ";
+			else file << 0 << " ";
 		}
 		file.close();
 	}
-	
+	void readNode() {
+		ifstream file(nodePath);
+		file >> hash;
+		file >> hashPref;
+		file >> isLeaf;
+		file >> nodePath;
+		if (isLeaf) file >> dataNodePath;
+		else {
+			int leftExists;
+			file >> leftExists;
+			if (leftExists) {
+				path leftPath;
+				file >> leftPath;
+				if (leftPath != "") {
+					left = new MerkleNode(leftPath);
+					left->nodePath = leftPath;
+					left->readNode();
+				}
+			}
+			int rightExists;
+			file >> rightExists;
+			if (rightExists) {
+				path rightPath;
+				file >> rightPath;
+				if (rightPath != "") {
+					right = new MerkleNode(rightPath);
+					right->nodePath = rightPath;
+					right->readNode();
+				}
+			}
+		}
+		file.close();
+	}
+
 };
 
 MerkleNode*& generateMerkleNodeFromFile(path filepath, path out, int hpref) {
 	if (hpref) sha256Hash(filepath, out);
 	else instructorsHash(filepath, out);
 	MerkleNode* node = new MerkleNode(out);
+	node->hashPref = hpref;
+	node->isLeaf = 1;
 	return node;
 }
 
@@ -129,7 +144,7 @@ public:
 		if (!exists(folderPath)) return;
 		for (const auto& file : directory_iterator(folderPath)) {
 			if (!is_directory(file)) {
-				path out = fol / (to_string(currentNodeIndex)+".txt");
+				path out = fol / (to_string(currentNodeIndex) + ".txt");
 				MerkleNode* node = generateMerkleNodeFromFile(file.path(), out, hpref);
 				node->dataNodePath = file.path();
 				nodes.push(node);
@@ -141,9 +156,9 @@ public:
 			nodes.pop();
 			MerkleNode* right = nodes.front();
 			nodes.pop();
-			path out = fol / (to_string(currentNodeIndex)+".txt");
+			path out = fol / (to_string(currentNodeIndex) + ".txt");
 			MerkleNode* node = new MerkleNode(left, right);
-			
+
 			node->nodePath = out;
 			nodes.push(node);
 			node->writeNode();
@@ -151,6 +166,6 @@ public:
 		}
 		root = nodes.front();
 	}
-	Vector<Vector<path>> getChangedFiles()
-	
+	//Vector<Vector<path>> getChangedFiles();
+
 };
