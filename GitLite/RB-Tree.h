@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <string>
+
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -152,7 +152,7 @@ private:
         }
         else {
             Node xParent = readNodeFromFile(x.parentFile.getData());
-            if (xFileName.string() == xParent.leftFile) {
+            if (xParent.leftFile.isGreaterThan(xFileName.string()) == 3) { // xParent.leftFile == xFileName.string()
                 xParent.leftFile = yFileName.string();
             }
             else {
@@ -190,7 +190,7 @@ private:
         }
         else {
             Node yParent = readNodeFromFile(y.parentFile.getData());
-            if (yFileName.string() == yParent.leftFile) {
+            if (yParent.leftFile.isGreaterThan(yFileName.string()) == 3) { // yParent.leftFile == yFileName.string()
                 yParent.leftFile = xFileName.string();
             }
             else {
@@ -254,7 +254,7 @@ private:
             }
             else {
                 if (currentNode.parentFile == grandparentNode.leftFile) {
-                    if (currentFileName == parentNode.rightFile) {
+                    if (parentNode.rightFile.isGreaterThan(currentFileName.string()) == 3) { 
                         leftRotate(currentNode.parentFile.getData());
                         currentFileName = currentNode.parentFile.getData();
                         currentNode = readNodeFromFile(currentFileName);
@@ -267,7 +267,7 @@ private:
                     rightRotate(parentNode.parentFile.getData());
                 }
                 else {
-                    if (currentFileName == parentNode.leftFile) {
+                    if (parentNode.leftFile.isGreaterThan(currentFileName.string()) == 3) {
                         rightRotate(currentNode.parentFile.getData());
                         currentFileName = currentNode.parentFile.getData();
                         currentNode = readNodeFromFile(currentFileName);

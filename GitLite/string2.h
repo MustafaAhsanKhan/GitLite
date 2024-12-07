@@ -81,6 +81,14 @@ public:
 		}
 		push_back('\0'); // add null character at the end
 	}
+	String(const std::string& text) {
+		int i = 0;
+		while (i < text.length()) {
+			push_back(text[i++]); // Add characters from std::string
+		}
+		push_back('\0'); // Add null character at the end
+	}
+
 	String(const String& text)
 	{
 		int i = 0;

@@ -160,6 +160,7 @@ public:
             return newNodeFile;
         }
 
+
         Node node = readNodeFromFile(nodeFileName);
 
         if (key.isGreaterThan(node.key) == 2) {  // Less
