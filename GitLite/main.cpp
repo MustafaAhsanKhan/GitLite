@@ -111,6 +111,8 @@ int main() {
         }
     }
 
+	//tree.deleteKey("30");
+
 	// In-order traversal to write the tree to a file
 	tree.inOrder();
 

@@ -203,7 +203,94 @@ public:
         return nodeFileName;
     }
 
+    fs::path deleteHelper(const fs::path& nodeFileName, const String& key) {
+        if (nodeFileName.empty()) {
+            // Key not found
+            return nodeFileName;
+        }
 
+        Node node = readNodeFromFile(nodeFileName);
+
+        // Perform standard BST deletion
+        if (key.isGreaterThan(node.key) == 2) { // Key is less
+            node.leftFile = deleteHelper(node.leftFile.getData(), key).string();
+        }
+        else if (key.isGreaterThan(node.key) == 1) { // Key is greater
+            node.rightFile = deleteHelper(node.rightFile.getData(), key).string();
+        }
+        else {
+            // Node with only one child or no child
+            if (node.leftFile.empty() || node.rightFile.empty()) {
+                fs::path tempFileName = node.leftFile.empty() ? node.rightFile.getData() : node.leftFile.getData();
+
+                // Delete current node file
+                fs::remove(nodeFileName);
+
+                // If no child
+                if (tempFileName.empty()) {
+                    // No further action needed
+                    return "";
+                }
+                else {
+                    return tempFileName; // Return the non-empty child
+                }
+            }
+            else {
+                // Node with two children: Get the inorder successor
+                fs::path tempFileName = minValueNode(node.rightFile.getData());
+                Node tempNode = readNodeFromFile(tempFileName);
+
+                // Copy the inorder successor's data to this node
+                node.key = tempNode.key;
+                node.dataRow = tempNode.dataRow;
+
+                // Delete the inorder successor
+                node.rightFile = deleteHelper(node.rightFile.getData(), tempNode.key).string();
+            }
+        }
+
+        // Update `isLeaf` flag
+        node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
+
+        // Write the updated node back to the file
+        writeNodeToFile(node, nodeFileName);
+
+        // Update balance factors and heights
+        updateBalanceFactor(nodeFileName);
+        node = readNodeFromFile(nodeFileName);
+        int balance = node.balanceFactor;
+
+        // Balance the tree
+        // Left Left Case
+        if (balance > 1 && getBalanceFactor(node.leftFile.getData()) >= 0) {
+            return rightRotate(nodeFileName);
+        }
+
+        // Left Right Case
+        if (balance > 1 && getBalanceFactor(node.leftFile.getData()) < 0) {
+            node.leftFile = leftRotate(node.leftFile.getData()).string();
+            writeNodeToFile(node, nodeFileName);
+            return rightRotate(nodeFileName);
+        }
+
+        // Right Right Case
+        if (balance < -1 && getBalanceFactor(node.rightFile.getData()) <= 0) {
+            return leftRotate(nodeFileName);
+        }
+
+        // Right Left Case
+        if (balance < -1 && getBalanceFactor(node.rightFile.getData()) > 0) {
+            node.rightFile = rightRotate(node.rightFile.getData()).string();
+            writeNodeToFile(node, nodeFileName);
+            return leftRotate(nodeFileName);
+        }
+
+        return nodeFileName;
+    }
+
+    void deleteKey(const String& key) {
+        rootFileName = deleteHelper(rootFileName, key);
+    }
 
     /*void updateHeight(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return;
@@ -216,6 +303,18 @@ public:
 
         writeNodeToFile(node, nodeFileName);
     }*/
+
+    fs::path minValueNode(const fs::path& nodeFileName) {
+        fs::path currentFileName = nodeFileName;
+        Node currentNode = readNodeFromFile(currentFileName);
+
+        // Loop down to find the leftmost leaf
+        while (!currentNode.leftFile.empty()) {
+            currentFileName = currentNode.leftFile.getData();
+            currentNode = readNodeFromFile(currentFileName);
+        }
+        return currentFileName;
+    }
 
 
     void updateBalanceFactor(const fs::path& nodeFileName) {
