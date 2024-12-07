@@ -101,7 +101,7 @@ struct MerkleNode {
 				if (leftPath != "") {
 					left = new MerkleNode(leftPath);
 					left->nodePath = leftPath;
-					left->readNode();
+					//left->readNode();
 				}
 			}
 			int rightExists;
@@ -112,7 +112,7 @@ struct MerkleNode {
 				if (rightPath != "") {
 					right = new MerkleNode(rightPath);
 					right->nodePath = rightPath;
-					right->readNode();
+					//right->readNode();
 				}
 			}
 		}
@@ -133,7 +133,7 @@ MerkleNode*& generateMerkleNodeFromFile(path filepath, path out, int hpref) {
 class MerkleTree {
 	MerkleNode* root;
 	int hpref;
-	queue<MerkleNode*> nodes;
+	Queue<MerkleNode*> nodes;
 	int currentNodeIndex = 0;
 public:
 	MerkleTree(int hpref) {
@@ -152,10 +152,10 @@ public:
 			}
 		}
 		while (nodes.size() > 1) {
-			MerkleNode* left = nodes.front();
-			nodes.pop();
-			MerkleNode* right = nodes.front();
-			nodes.pop();
+			MerkleNode* left = nodes.pop();
+			//nodes.pop();
+			MerkleNode* right = nodes.pop();
+			//nodes.pop();
 			path out = fol / (to_string(currentNodeIndex) + ".txt");
 			MerkleNode* node = new MerkleNode(left, right);
 
@@ -164,8 +164,14 @@ public:
 			node->writeNode();
 			currentNodeIndex++;
 		}
-		root = nodes.front();
+		root = nodes.p();
 	}
-	//Vector<Vector<path>> getChangedFiles();
+	static Vector<Vector<path>> getChangedFiles(path branch1, path branch2) {
+		Vector<Vector<path>> changedFiles;
+		MerkleNode* root1 = new MerkleNode(branch1);
+		MerkleNode* root2 = new MerkleNode(branch2);
+		Queue <Vector< MerkleNode* >> q1;
+
+	};
 
 };
