@@ -3,46 +3,16 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-
+#include <string>
 
 using namespace std;
 namespace fs = std::filesystem;
 
 // Custom to_string function for String class
-String custom_to_string(int value) {
-    String result;
-    bool isNegative = false;
-
-    // Handle negative numbers
-    if (value < 0) {
-        isNegative = true;
-        value = -value;
-    }
-
-    // Convert integer to string
-    do {
-        result += (value % 10) + '0';
-        value /= 10;
-    } while (value > 0);
-
-    // Add negative sign if necessary
-    if (isNegative) {
-        result += '-';
-    }
-
-    // Reverse the string since the digits are added in reverse order
-    int len = result.size();
-    for (int i = 0; i < len / 2; ++i) {
-        char temp = result[i];
-        result[i] = result[len - i - 1];
-        result[len - i - 1] = temp;
-    }
-
-    return result;
-}
+String custom_to_string(int value);
 
 // Red-Black Tree node stored in a file
-struct Node {
+struct RBNode {
     String key;
     String color;      // "RED" or "BLACK"
     String leftFile;
@@ -50,7 +20,7 @@ struct Node {
     String parentFile;
     String dataRow;
 
-    Node(const String& k = "", const String& c = "RED",
+    RBNode(const String& k = "", const String& c = "RED",
         const String& left = "", const String& right = "",
         const String& parent = "", const String& data = "")
         : key(k), color(c), leftFile(left), rightFile(right),
@@ -88,12 +58,12 @@ private:
         }
     }
 
-    // Read node from file
-    Node readNodeFromFile(const fs::path& filePath) {
+    // Read RBNode from file
+    RBNode readNodeFromFile(const fs::path& filePath) {
         std::ifstream nodeFile(filePath);
         if (!nodeFile.is_open()) {
             // Return a default node indicating it doesn't exist
-            return Node();
+            return RBNode();
         }
 
         String key, color, leftFile, rightFile, parentFile, dataRow;
@@ -107,11 +77,11 @@ private:
 
         nodeFile.close();
 
-        return Node(key, color, leftFile, rightFile, parentFile, dataRow);
+        return RBNode(key, color, leftFile, rightFile, parentFile, dataRow);
     }
 
-    // Write node to file
-    void writeNodeToFile(const Node& node, const fs::path& filePath) {
+    // Write RBNode to file
+    void writeNodeToFile(const RBNode& node, const fs::path& filePath) {
         std::ofstream nodeFile(filePath);
         nodeFile << node.key << '\n';
         nodeFile << node.color << '\n';
@@ -122,112 +92,115 @@ private:
         nodeFile.close();
     }
 
-    // Update parent link in child node
+    // Update parent link in child RBNode
     void updateParentInChild(const String& childFileName, const String& parentFileName) {
         if (childFileName.empty()) return;
-        Node childNode = readNodeFromFile(childFileName.getData());
+        RBNode childNode = readNodeFromFile(childFileName.getData());
         childNode.parentFile = parentFileName;
         writeNodeToFile(childNode, childFileName.getData());
     }
 
-    // Left rotate subtree rooted at x
-    void leftRotate(const fs::path& xFileName) {
-        Node x = readNodeFromFile(xFileName);
-        fs::path yFileName = x.rightFile.getData();
-        if (yFileName.empty()) return; // Cannot rotate if right child does not exist
-
-        Node y = readNodeFromFile(yFileName);
+    // Left rotation
+    fs::path leftRotate(const fs::path& nodeFileName) {
+        RBNode node = readNodeFromFile(nodeFileName);
+        fs::path rightFileName = node.rightFile.getData();
+        if (rightFileName.empty()) {
+            return nodeFileName;  // Cannot rotate without right child
+        }
+        RBNode rightNode = readNodeFromFile(rightFileName);
 
         // Perform rotation
-        x.rightFile = y.leftFile;
-        if (!y.leftFile.empty()) {
-            Node yLeftChild = readNodeFromFile(y.leftFile.getData());
-            yLeftChild.parentFile = xFileName.string();
-            writeNodeToFile(yLeftChild, y.leftFile.getData());
+        node.rightFile = rightNode.leftFile;
+        rightNode.leftFile = nodeFileName.string();
+
+        // Update parent pointers
+        rightNode.parentFile = node.parentFile;
+        node.parentFile = rightFileName.string();
+        if (!node.rightFile.empty()) {
+            updateParentInChild(node.rightFile, nodeFileName.string());
         }
 
-        y.parentFile = x.parentFile;
-        if (x.parentFile.empty()) {
-            rootFileName = yFileName;
+        // Update parent node's child pointer
+        if (!rightNode.parentFile.empty()) {
+            RBNode parentNode = readNodeFromFile(rightNode.parentFile.getData());
+            if (parentNode.leftFile == nodeFileName.string()) {
+                parentNode.leftFile = rightFileName.string();
+            }
+            else if (parentNode.rightFile == nodeFileName.string()) {
+                parentNode.rightFile = rightFileName.string();
+            }
+            writeNodeToFile(parentNode, rightNode.parentFile.getData());
         }
         else {
-            Node xParent = readNodeFromFile(x.parentFile.getData());
-            if (xParent.leftFile.isGreaterThan(xFileName.string()) == 3) { // xParent.leftFile == xFileName.string()
-                xParent.leftFile = yFileName.string();
-            }
-            else {
-                xParent.rightFile = yFileName.string();
-            }
-            writeNodeToFile(xParent, x.parentFile.getData());
+            // If node was the root, update rootFileName
+            rootFileName = rightFileName;
         }
 
-        y.leftFile = xFileName.string();
-        x.parentFile = yFileName.string();
+        // Write updated nodes to files
+        writeNodeToFile(node, nodeFileName);
+        writeNodeToFile(rightNode, rightFileName);
 
-        writeNodeToFile(x, xFileName);
-        writeNodeToFile(y, yFileName);
+        return rightFileName;  // New root after rotation
     }
 
-    // Right rotate subtree rooted at y
-    void rightRotate(const fs::path& yFileName) {
-        Node y = readNodeFromFile(yFileName);
-        fs::path xFileName = y.leftFile.getData();
-        if (xFileName.empty()) return; // Cannot rotate if left child does not exist
-
-        Node x = readNodeFromFile(xFileName);
+    // Right rotation
+    fs::path rightRotate(const fs::path& nodeFileName) {
+        RBNode node = readNodeFromFile(nodeFileName);
+        fs::path leftFileName = node.leftFile.getData();
+        if (leftFileName.empty()) {
+            return nodeFileName;  // Cannot rotate without left child
+        }
+        RBNode leftNode = readNodeFromFile(leftFileName);
 
         // Perform rotation
-        y.leftFile = x.rightFile;
-        if (!x.rightFile.empty()) {
-            Node xRightChild = readNodeFromFile(x.rightFile.getData());
-            xRightChild.parentFile = yFileName.string();
-            writeNodeToFile(xRightChild, x.rightFile.getData());
+        node.leftFile = leftNode.rightFile;
+        leftNode.rightFile = nodeFileName.string();
+
+        // Update parent pointers
+        leftNode.parentFile = node.parentFile;
+        node.parentFile = leftFileName.string();
+        if (!node.leftFile.empty()) {
+            updateParentInChild(node.leftFile, nodeFileName.string());
         }
 
-        x.parentFile = y.parentFile;
-        if (y.parentFile.empty()) {
-            rootFileName = xFileName;
+        // Update parent node's child pointer
+        if (!leftNode.parentFile.empty()) {
+            RBNode parentNode = readNodeFromFile(leftNode.parentFile.getData());
+            if (parentNode.leftFile == nodeFileName.string()) {
+                parentNode.leftFile = leftFileName.string();
+            }
+            else if (parentNode.rightFile == nodeFileName.string()) {
+                parentNode.rightFile = leftFileName.string();
+            }
+            writeNodeToFile(parentNode, leftNode.parentFile.getData());
         }
         else {
-            Node yParent = readNodeFromFile(y.parentFile.getData());
-            if (yParent.leftFile.isGreaterThan(yFileName.string()) == 3) { // yParent.leftFile == yFileName.string()
-                yParent.leftFile = xFileName.string();
-            }
-            else {
-                yParent.rightFile = xFileName.string();
-            }
-            writeNodeToFile(yParent, y.parentFile.getData());
+            // If node was the root, update rootFileName
+            rootFileName = leftFileName;
         }
 
-        x.rightFile = yFileName.string();
-        y.parentFile = xFileName.string();
+        // Write updated nodes to files
+        writeNodeToFile(node, nodeFileName);
+        writeNodeToFile(leftNode, leftFileName);
 
-        writeNodeToFile(y, yFileName);
-        writeNodeToFile(x, xFileName);
+        return leftFileName;  // New root after rotation
     }
 
-    // Fix the Red-Black Tree after insertion
-    void fixInsert(const fs::path& nodeFileName) {
-        fs::path currentFileName = nodeFileName;
+    // Fix Red-Black Tree properties after insertion
+    void fixInsert(fs::path& nodeFileName) {
+        RBNode node = readNodeFromFile(nodeFileName);
 
-        while (true) {
-            Node currentNode = readNodeFromFile(currentFileName);
-            if (currentNode.parentFile.empty()) {
-                currentNode.color = "BLACK";
-                writeNodeToFile(currentNode, currentFileName);
-                break;
-            }
-
-            Node parentNode = readNodeFromFile(currentNode.parentFile.getData());
+        while (node.parentFile.getData() != "") {
+            RBNode parentNode = readNodeFromFile(node.parentFile.getData());
             if (parentNode.color == "BLACK") {
                 break;
             }
 
-            Node grandparentNode = readNodeFromFile(parentNode.parentFile.getData());
+            RBNode grandparentNode = readNodeFromFile(parentNode.parentFile.getData());
             String uncleFileName;
-            Node uncleNode;
+            RBNode uncleNode;
 
-            if (currentNode.parentFile == grandparentNode.leftFile) {
+            if (parentNode.parentFile == grandparentNode.leftFile) {
                 uncleFileName = grandparentNode.rightFile;
             }
             else {
@@ -246,56 +219,61 @@ private:
                 uncleNode.color = "BLACK";
                 grandparentNode.color = "RED";
 
-                writeNodeToFile(parentNode, currentNode.parentFile.getData());
+                writeNodeToFile(parentNode, node.parentFile.getData());
                 writeNodeToFile(uncleNode, uncleFileName.getData());
                 writeNodeToFile(grandparentNode, parentNode.parentFile.getData());
 
-                currentFileName = parentNode.parentFile.getData();
+                nodeFileName = parentNode.parentFile.getData();
+                node = readNodeFromFile(nodeFileName);
             }
             else {
-                if (currentNode.parentFile == grandparentNode.leftFile) {
-                    if (parentNode.rightFile.isGreaterThan(currentFileName.string()) == 3) { 
-                        leftRotate(currentNode.parentFile.getData());
-                        currentFileName = currentNode.parentFile.getData();
-                        currentNode = readNodeFromFile(currentFileName);
-                        parentNode = readNodeFromFile(currentNode.parentFile.getData());
+                if (node.parentFile == grandparentNode.leftFile) {
+                    if (parentNode.rightFile == nodeFileName.string()) {
+                        leftRotate(node.parentFile.getData());
+                        nodeFileName = node.parentFile.getData();
+                        node = readNodeFromFile(nodeFileName);
+                        parentNode = readNodeFromFile(node.parentFile.getData());
                     }
                     parentNode.color = "BLACK";
                     grandparentNode.color = "RED";
-                    writeNodeToFile(parentNode, currentNode.parentFile.getData());
+                    writeNodeToFile(parentNode, node.parentFile.getData());
                     writeNodeToFile(grandparentNode, parentNode.parentFile.getData());
                     rightRotate(parentNode.parentFile.getData());
                 }
                 else {
-                    if (parentNode.leftFile.isGreaterThan(currentFileName.string()) == 3) {
-                        rightRotate(currentNode.parentFile.getData());
-                        currentFileName = currentNode.parentFile.getData();
-                        currentNode = readNodeFromFile(currentFileName);
-                        parentNode = readNodeFromFile(currentNode.parentFile.getData());
+                    if (parentNode.leftFile == nodeFileName.string()) {
+                        rightRotate(node.parentFile.getData());
+                        nodeFileName = node.parentFile.getData();
+                        node = readNodeFromFile(nodeFileName);
+                        parentNode = readNodeFromFile(node.parentFile.getData());
                     }
                     parentNode.color = "BLACK";
                     grandparentNode.color = "RED";
-                    writeNodeToFile(parentNode, currentNode.parentFile.getData());
+                    writeNodeToFile(parentNode, node.parentFile.getData());
                     writeNodeToFile(grandparentNode, parentNode.parentFile.getData());
                     leftRotate(parentNode.parentFile.getData());
                 }
                 break;
             }
         }
+
+        RBNode rootNode = readNodeFromFile(rootFileName);
+        rootNode.color = "BLACK";
+        writeNodeToFile(rootNode, rootFileName);
     }
 
     // Insert helper function
     fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow, const String& parentFileName) {
         if (nodeFileName.empty()) {
             fs::path newNodeFile = generateFileName();
-            Node newNode(key, "RED", "", "", parentFileName, dataRow);
+            RBNode newNode(key, "RED", "", "", parentFileName, dataRow);
             writeNodeToFile(newNode, newNodeFile);
             return newNodeFile;
         }
 
-        Node node = readNodeFromFile(nodeFileName);
+        RBNode node = readNodeFromFile(nodeFileName);
 
-        if (key.isGreaterThan(node.key) == 2) {  // Less
+        if (key.isGreaterThan(node.key) == 2) {  // Key is less
             fs::path updatedLeftChild = insertHelper(node.leftFile.getData(), key, dataRow, nodeFileName.string());
             node.leftFile = updatedLeftChild.string();
             writeNodeToFile(node, nodeFileName);
@@ -323,17 +301,14 @@ public:
     }
 
     void insert(const String& key, const String& dataRow) {
-        fs::path insertedNodeFile = insertHelper(rootFileName, key, dataRow, "");
-        if (rootFileName.empty()) {
-            rootFileName = insertedNodeFile;
-        }
-        fixInsert(insertedNodeFile);
+        rootFileName = insertHelper(rootFileName, key, dataRow, "");
+        fixInsert(rootFileName);
     }
 
     void inOrderTraversal(const fs::path& nodeFileName) {
         if (nodeFileName.empty()) return;
 
-        Node node = readNodeFromFile(nodeFileName);
+        RBNode node = readNodeFromFile(nodeFileName);
         inOrderTraversal(node.leftFile.getData());
         std::cout << "Key: " << node.key
             << ", Color: " << node.color
