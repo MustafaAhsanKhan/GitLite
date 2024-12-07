@@ -95,6 +95,7 @@ public:
             }
             line += ch;
         }
+        line.push_back('\0');
     }
 
     Node readNodeFromFile(const fs::path& filePath) {

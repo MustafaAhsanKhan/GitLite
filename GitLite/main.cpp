@@ -11,7 +11,7 @@ using namespace std;
 
 bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
     line.clear();
-    char ch;
+    char ch; 
     while (file.get(ch)) {
         if (ch == delimiter) {
             return true; // Successfully read a line
