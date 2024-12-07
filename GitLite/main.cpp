@@ -11,7 +11,7 @@ using namespace std;
 
 bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
     line.clear();
-    char ch;
+    char ch; 
     while (file.get(ch)) {
         if (ch == delimiter) {
             return true; // Successfully read a line
@@ -111,6 +111,9 @@ int main() {
             cout << "Row has fewer columns than expected." << endl;
         }
     }
+
+	// In-order traversal to write the tree to a file
+	tree.inOrder();
 
     csvFile.close();
 

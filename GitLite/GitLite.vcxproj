@@ -134,6 +134,7 @@
     <ClInclude Include="BTreeNode.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="RB-Tree.h" />
     <ClInclude Include="string2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="string2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="healthcare_dataset.csv" />
     <None Include="t.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

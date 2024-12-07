@@ -33,6 +33,9 @@
     <ClInclude Include="string2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RB-Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp">
@@ -50,5 +53,13 @@
     <ClCompile Include="string2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="healthcare_dataset.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="t.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
