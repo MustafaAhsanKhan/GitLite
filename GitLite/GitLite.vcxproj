@@ -133,6 +133,7 @@
     <ClInclude Include="BTreeNode.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="RB-Tree.h" />
     <ClInclude Include="string2.h" />
   </ItemGroup>
   <ItemGroup>
