@@ -144,6 +144,7 @@
     <ClCompile Include="BTree.cpp" />
     <ClCompile Include="BTreeFileSystem.h" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="GitLite.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="String.cpp" />
