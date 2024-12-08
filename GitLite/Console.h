@@ -1,5 +1,5 @@
 #pragma once
-#include "string2.h"
+#include "String.h"
 class Console
 {
 private:

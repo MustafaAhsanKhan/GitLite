@@ -18,7 +18,6 @@ void Console::run()  // Program Loop
 		cout << '>';  // Ready for user input
 		cin >> command;
 		command.toLower();  // Convert to lowercase to make everything consistent
-		cout << command;
 
 		if (command == "exit")
 		{
