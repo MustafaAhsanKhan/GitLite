@@ -145,24 +145,6 @@ void Console::parseCsv(int selectedTree, String second)
 
 	csvFile.close();
 
-	switch (selectedTree)
-	{
-		case(1):
-		{
-			avl.inOrder();
-			break;
-		}
-		case(2):
-		{
-			//Btree.initialize(directoryName);
-			break;
-		}
-		case(3):
-		{
-			//rb.inorder();
-			break;
-		}
-	}
 }
 
 void Console::run()  // Program Loop
@@ -290,6 +272,25 @@ void Console::run()  // Program Loop
 			// DO AT THE END //
 			// second stores the branch the visualize
 			// Call the respective display functions
+
+			switch (selectedTree)
+			{
+				case(1):
+				{
+					avl.inOrder();
+					break;
+				}
+				case(2):
+				{
+					//Btree.initialize(directoryName);
+					break;
+				}
+				case(3):
+				{
+					rb.inOrder();
+					break;
+				}
+			}
 		}
 		else if (command == "log")
 		{

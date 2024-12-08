@@ -35,7 +35,9 @@ private:
 
     void createDirectory(const String& dirName) {
         directoryPath = fs::path(dirName.getData());
-        if (!fs::exists(directoryPath)) {
+        if (!fs::exists(directoryPath))
+        {
+            std::cout << "Created branch: " << directoryPath << std::endl;
             fs::create_directory(directoryPath);
         }
     }
