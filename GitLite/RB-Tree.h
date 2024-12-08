@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 // Custom to_string function for String class
 inline String custom_to_string(int value);
 
+// custom to string function to convert an integer to its respective string
 String custom_to_string(int value) {
     String result;
     bool isNegative = false;
@@ -24,16 +25,16 @@ String custom_to_string(int value) {
     // Convert integer to string
     do {
         char digit = (value % 10) + '0'; // Get the last digit as a character
-        result = result + digit;//result += digit;                // Append the digit to the result
+        result = result + digit;//result += digit;                // to add the digit to the result
         value = value / 10; ; // value =/ 10                // Remove the last digit
     } while (value > 0);
 
-    // Add negative sign if necessary
+    // if negative add the negative sign
     if (isNegative) {
-        result = result + '-';// result += '-';
+        result = result + '-';
     }
 
-    // Reverse the string since digits were added in reverse order
+    // because digits were added in reverse order 
     int len = result.size();
     for (int i = 0; i < len / 2; ++i) {
         char temp = result[i];
@@ -45,7 +46,7 @@ String custom_to_string(int value) {
     return result;
 }
 
-// Red-Black Tree node stored in a file
+
 struct RBNode {
     String key;
     String color;      // "RED" or "BLACK"
@@ -70,7 +71,7 @@ private:
 
    
 
-
+    // create a file to store the tree in 
     void createDirectory(const String& dirName) {
         directoryPath = fs::path(dirName.getData());
         std::cout << "Created branch: " << directoryPath << std::endl;
@@ -79,7 +80,7 @@ private:
         }
     }
   
-
+    // generating uniquw file names which depend on node count hence unique
     fs::path generateFileName() {
         String fileName = std::to_string(nodeCount++) + ".txt";
         std::cout << "Generated file name: " << fileName << std::endl; // Debugging line
@@ -87,7 +88,7 @@ private:
     }
   
 
-    // Custom getline function
+    // Custom getline function it reads lines from the file
     void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
         line.clear();
         char ch;
@@ -125,7 +126,7 @@ private:
         return RBNode(key, color, leftFile, rightFile, parentFile, dataRow);
     }
 
-    // Write RBNode to file
+    // to write RB Nodes to files
     void writeNodeToFile(const RBNode& node, const fs::path& filePath) {
        // std::cout << "Writing node to file: " << filePath << std::endl; // Debugging line
         std::ofstream nodeFile(filePath);
@@ -398,8 +399,9 @@ private:
 public:
     RBTree() : rootFileName(""), nodeCount(0) {}
 
-    void initialize(const String& dirName) {
-        createDirectory(dirName);
+    void initialize( fs::path dirName) {
+        //createDirectory(dirName);
+        directoryPath = dirName;
     }
 
     void insert(const String& key, const String& dataRow) {

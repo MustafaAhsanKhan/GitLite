@@ -8,6 +8,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+
 inline String custom_to_string(int value);
 
 // An AVL tree node
@@ -60,8 +61,8 @@ private:
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
-    void initialize(const String& dirName) {
-        createDirectory(dirName);
+    void initialize(fs::path dirPath) {
+        directoryPath = dirPath;
     }
 
     void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {

@@ -22,18 +22,18 @@ bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
 	return !line.empty(); // Return true if there was any content read before EOF
 }
 
-void Console::parseCsv(int selectedTree, String second)
+void Console::parseCsv(int selectedTree, String second, path treeDir)
 {
 	String csvFileName = second;  // csv file
 
-	String directoryName = "master";
+	String directoryName = "tree";
 
 	// Create the tree using a switch based on the selected tree
 	switch (selectedTree)
 	{
 		case(1):
 		{
-			avl.initialize(directoryName);
+			avl.initialize(treeDir);
 			break;
 		}
 		case(2):
@@ -43,7 +43,7 @@ void Console::parseCsv(int selectedTree, String second)
 		}
 		case(3):
 		{
-			rb.initialize(directoryName);
+			rb.initialize(treeDir);
 			break;
 		}
 	}
@@ -250,10 +250,12 @@ void Console::run()  // Program Loop
 				}
 			}
 			cout << endl;
-			parseCsv(treeType, second);
 			file << "master";
 			create_directory(repoFolder / "master");
 			currentBranchFolder = repoFolder / "master";
+			create_directory(currentBranchFolder / "tree");
+			parseCsv(treeType, second, currentBranchFolder/"tree");
+
 			file.close();
 		}
 		else if (command == "branch")
