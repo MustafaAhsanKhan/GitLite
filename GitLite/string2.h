@@ -205,6 +205,14 @@ public:
 		}
 		push_back('\0');
 	}
+	void readTill(String& other, char delimeter) {
+		len = 0;
+		int i = 0;
+		while (other[i++] && other[i-1]!=delimeter) {
+			push_back(other[i - 1]);
+		}
+		push_back('\0');
+	}
 	bool operator==(const char* text) { // check character by character
 		int i = 0;
 		while (data[i] && text[i]) {

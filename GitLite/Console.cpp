@@ -63,42 +63,72 @@ void Console::run()  // Program Loop
 		// All inputs
 		if (command == "init")
 		{
+			String folderName;
+			folderName.readTill(second, '.');
+
+
+			repoFolder = current_path() / folderName.getData();
+			create_directory(repoFolder);
 			// Create the repo using the filename provided
 			cout << "\033[33mWhich tree would you like to use?\033[0m" << endl;
 			cout << "1: AVL" << endl;
 			cout << "2: B-Tree" << endl;
 			cout << "3: Red-Black Tree" << endl;
-
+			ofstream file(repoFolder / "repo_data.txt");
 			int x = 0;
 			while (1)
 			{
 				cin >> x;
+				treeType = x;
 				if (x == 1)
 				{
 					cout << "\033[33mSelected AVL tree.\033[0m";
+					file << x << endl;
 					break;
 				}
 				else if (x == 2)
 				{
 					cout << "\033[33mSelected B-Tree.\033[0m";
+					file << x << endl;
 					break;
 				}
 				else if (x == 3)
 				{
 					cout << "\033[33mSelected Red-Black Tree.\033[0m";
+					file << x << endl;
 					break;
 				}
 			}
+			file << "master";
+			create_directory(repoFolder / "master");
+			currentBranchFolder = repoFolder / "master";
+			file.close();
 		}
 		else if (command == "branch")
 		{
+
+			create_directory(repoFolder / second.getData());
+			copy(currentBranchFolder, repoFolder / second.getData());
+			currentBranchFolder = repoFolder / second.getData();
+			ofstream file(repoFolder / "repo_data.txt");
+			file << treeType << endl << second;
 			// second stores branch name
 			cout << "\033[33mBranch " << '\'' << second << '\'' << " created successfully.\033[0m";
+			file.close();
 		}
 		else if (command == "checkout")
 		{
+			if (exists(repoFolder / second.getData())) {
+				currentBranchFolder = repoFolder / second.getData();
+				ofstream file(repoFolder / "repo_data.txt");
+				file << treeType << endl << second;
+				file.close();
+				cout << "\033[33mSwitched to branch " << '\'' << second << '\'' << ".\033[0m";
+			}
+			else {
+				cout << "\033[91mBranch " << '\'' << second << '\'' << " does not exist.\033[0m";
+			}
 			// second stores branch name
-			cout << "\033[33mSwitched to branch " << '\'' << second << '\'' << ".\033[0m";
 		}
 		else if (command == "commit")
 		{
@@ -107,17 +137,25 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "branches")
 		{
-			// List all branches
-			cout << "\033[33mBranches:\033[0m" << endl << "\033[33mmain\033[0m" << endl << "\033[33mfeature-1\033[0m";
-			cout << "\033[33mTemp1\033[0m" << endl << "\033[33mTemp2\033[0m";
+			for (const auto& folder : directory_iterator(repoFolder)) {
+				if (is_directory(folder)) {
+					cout << "\033[33m" << folder.path().filename() << "\033[0m" << endl;
+				}
+			}
 		}
 		else if (command == "delete-branch")
 		{
-			// second stores branch name
-			cout << "\033[33mBranch " << '\'' << second << '\'' << " deleted successfully.\033[0m";
+			if (exists(repoFolder / second.getData())) {
+				remove_all(repoFolder / second.getData());
+				cout << "\033[33mBranch " << '\'' << second << '\'' << " deleted successfully.\033[0m";
+			}
+			else {
+				cout << "\033[91mBranch " << '\'' << second << '\'' << " does not exist.\033[0m";
+			}
 		}
 		else if (command == "merge")
 		{
+
 			// second stores the source branch
 			// third stores the target branch
 			cout << "\033[33mMerged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.\033[0m";
@@ -138,7 +176,8 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "current-branch")
 		{
-			cout << "\033[33mYou are on branch: 'main'.\033[0m";  // Replace with current branch
+			cout << "\033[33m" << currentBranchFolder.filename() << "\033[0m";
+			//cout << "\033[33mYou are on branch: 'main'.\033[0m";  // Replace with current branch
 		}
 		else if (command == "save")
 		{
@@ -146,6 +185,28 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "load")
 		{
+			if (repoFolder == "") {
+				if (exists(current_path() / second.getData())){
+					repoFolder = current_path() / second.getData();
+					ifstream file(repoFolder / "repo_data.txt");
+					file >> treeType;
+					String Branch;
+					file >> Branch;
+					currentBranchFolder = repoFolder / Branch.getData();
+					file.close();
+
+					cout << "\033[33mRepository loaded successfully from '" << second << "'.\033[0m";
+				}
+
+				else {
+					cout << "\033[91mNo repository found. Please initialize a repository first.\033[0m";
+				}
+			}
+			else {
+
+				cout << "\033[91mAlready in a repository. Close this repo first.\033[0m";
+			}
+
 			cout << "\033[33mRepository loaded successfully from '" << second << "'.\033[0m";
 		}
 		else
