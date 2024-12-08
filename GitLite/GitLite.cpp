@@ -68,31 +68,6 @@ public:
 		}
 		return front->data;
 	}
-	//void print() {
-	//	QNode<T>* temp = front;
-	//	while (temp != nullptr) {
-	//		std::cout << temp->data << " ";
-	//		temp = temp->next;
-	//	}
-	//	std::cout << std::endl;
-	//}
-	//bool is_empty() { return front == nullptr; }
-	//bool isPalindrome(char* str) {
-	//	Queue<char> q;
-	//	/*int i = 0;
-	//	while (str[i]) {
-	//		q.enqueue(str[i]);
-	//		i++;
-	//	}*/
-	//	return checkpal(q, str, 0);
-	//}
-	//bool checkpal(Queue<char>& q, char* str, int i) {
-	//	if (str[i] == 0) return true;
-	//	q.enqueue(str[i]);
-	//	if (!checkpal(q, str, i + 1)) return false;
-	//	if (q.dequeue() != str[i]) return false;
-	//	return true;
-	//}
 };
 
 template <typename T>
@@ -2149,6 +2124,33 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "merge")
 		{
+			path firstBranch = repoFolder / second.getData();
+			path secondBranch = repoFolder / third.getData();
+			if (exists(firstBranch) && exists(secondBranch)) {
+				Vector<Vector<path>> changedFiles = MerkleTree::getChangedFiles(firstBranch / "merkleRootAddr.txt", secondBranch / "merkleRootAddr.txt");
+				for (int i = 0; i < changedFiles.size(); i++)
+				{
+					ofstream destination(changedFiles[i][0]);
+					ifstream source(changedFiles[i][1]);
+					char ch;
+					while (source.get(ch)) {
+						destination << ch;
+					}
+				}
+				remove_all(repoFolder / third.getData());
+				cout << "\033[33mMerged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.\033[0m";
+				MerkleTree mt(1);
+				mt.generateFromFolder(currentBranchFolder / "tree", currentBranchFolder);
+			}
+			else if (!exists(firstBranch) && !exists(secondBranch)) {
+				cout << "\033[91mBoth branches does not exist.\033[0m";
+			}
+			else if (!exists(firstBranch)) {
+				cout << "\033[91mBranch " << '\'' << second << '\'' << " does not exist.\033[0m";
+			}
+			else {
+				cout << "\033[91mBranch " << '\'' << third << '\'' << " does not exist.\033[0m";
+			}
 
 			// second stores the source branch
 			// third stores the target branch
