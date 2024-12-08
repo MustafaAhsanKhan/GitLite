@@ -8,6 +8,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+
 inline String custom_to_string(int value);
 
 // An AVL tree node
@@ -60,6 +61,8 @@ private:
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
+    void initialize(fs::path dirPath) {
+        directoryPath = dirPath;
     void queryRange(int lowerBound, int upperBound) {
         cout << "\033[33mAVL Tree: Records within range [" << lowerBound << ", " << upperBound << "]:\033[0m" << endl;
         queryRangeHelper(rootFileName, lowerBound, upperBound);

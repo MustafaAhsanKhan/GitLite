@@ -147,7 +147,7 @@ struct BTreeNode {
         }
         file.close();
     }
-    void writeKey(int index, T key) {
+    void writeKey(int index, String& key) {
         path keyFilePath = currentNodePath.parent_path() / "keys" / (currentNodePath.filename().string() + to_string(index) + ".txt");
         ofstream keyFile(keyFilePath);
         keyFile << key;
@@ -186,10 +186,10 @@ class BTree {
         return new BTreeNode<T, o>(parentPath, nodePath);
     }
 
-    BTreeNode<T, o>* insert(BTreeNode<T, o>* node, T data, BTreeNode<T, o>*& newChild, T& newKey) {
+    BTreeNode<T, o>* insert(BTreeNode<T, o>* node, T data, BTreeNode<T, o>*& newChild, T& newKey, String& nodeData) {
         if (!node) {
             node = createNode(rootPath);
-            node->writeKey(node->numOfKeys, data);
+            node->writeKey(node->numOfKeys, nodeData);
             node->keys[node->numOfKeys++] = data;
             newChild = nullptr;
             node->write();
@@ -197,14 +197,18 @@ class BTree {
         }
         else {
             if (node->isLeaf) {
-				node->writeKey(node->numOfKeys, data);
+				node->writeKey(node->numOfKeys, nodeData);
                 node->keys[node->numOfKeys++] = data;
                 sort(node->keys, node->numOfKeys);
                 if (node->numOfKeys == o) {
                     newChild = createNode(node->currentNodePath);
                     newKey = node->keys[o / 2];
                     for (int i = o / 2 + 1; i < o; i++) {
-						newChild->writeKey(newChild->numOfKeys, node->keys[i]);
+                        String datdfa;
+						ifstream file(node->keyPath[i]);
+						datdfa.readComplete(file);
+                        file.close();
+						newChild->writeKey(newChild->numOfKeys, datdfa);
                         newChild->keys[newChild->numOfKeys++] = node->keys[i];
                     }
                     node->numOfKeys = o / 2;
@@ -224,14 +228,23 @@ class BTree {
                     i++;
                 }
                 BTreeNode<T, o>* child = new BTreeNode<T, o>(node->children[i]);
-                child = insert(child, data, newChild, newKey);
+                child = insert(child, data, newChild, newKey, nodeData);
                 if (newChild) {
+
                     for (int j = node->numOfKeys; j > i; j--) {
-                        node->writeKey(j, node->keys[j - 1]);
+                        String datdfa;
+                        ifstream file(node->keyPath[j - 1]);
+                        datdfa.readComplete(file);
+                        file.close();
+                        node->writeKey(j, datdfa);
                         node->keys[j] = node->keys[j - 1];
                         node->children[j + 1] = node->children[j];
                     }
-					node->writeKey(i, newKey);
+                    String datdfa;
+                    ifstream file(node->keyPath[i]);
+                    datdfa.readComplete(file);
+                    file.close();
+					node->writeKey(i, datdfa);
                     node->keys[i] = newKey;
                     node->children[i + 1] = newChild->currentNodePath;
                     node->numOfKeys++;
@@ -240,8 +253,12 @@ class BTree {
                         newChild->isLeaf = false;
                         newKey = node->keys[o / 2];
                         for (int j = o / 2 + 1; j < o; j++) {
-							newChild->writeKey(newChild->numOfKeys, node->keys[j]);
-                            newChild->keys[newChild->numOfKeys++] = node->keys[j];
+                            String datdfa;
+                            ifstream file(node->keyPath[i]);
+                            datdfa.readComplete(file);
+                            file.close();
+							newChild->writeKey(newChild->numOfKeys, datdfa);
+                            newChild->keys[newChild->numOfKeys++] = node->keys[j];  
                             newChild->children[newChild->numOfKeys] = node->children[j + 1];
                         }
                         newChild->children[0] = node->children[o / 2 + 1];
@@ -440,13 +457,17 @@ public:
         root = nullptr;
     }
 
-    void insert(T data) {
+    void insert(T data, String rowData) {
         BTreeNode<T, o>* newChild = nullptr;
         T newKey;
-        root = insert(root, data, newChild, newKey);
+        root = insert(root, data, newChild, newKey, rowData);
         if (newChild) {
             BTreeNode<T, o>* newRoot = createNode(rootPath);
-            newRoot->writeKey(0, newKey);
+            String datdfa;
+            ifstream file(newRoot->keyPath[0]);
+            datdfa.readComplete(file);
+            file.close();
+            newRoot->writeKey(0, datdfa);
             newRoot->keys[0] = newKey;
             newRoot->children[0] = root->currentNodePath;
             newRoot->children[1] = newChild->currentNodePath;

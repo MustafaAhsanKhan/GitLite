@@ -20,7 +20,7 @@ public:
 	AVL avl;
 	RBTree rb;
 	//BTree<int, 3> bt;
-	void parseCsv(int selectedTree, String second);
+	void parseCsv(int selectedTree, String second, path treeDir);
 	Console();
 	void run();
 };

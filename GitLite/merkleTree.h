@@ -1,5 +1,5 @@
 #pragma once
-#include "string2.h"
+#include "String.h"
 #include <fstream>
 #include "picosha2.h"
 #include "Vector"
