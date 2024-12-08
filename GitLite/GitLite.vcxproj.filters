@@ -18,9 +18,6 @@
     <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -31,6 +28,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AVL-Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RB-Tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="string2.h">
@@ -50,13 +53,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="String.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="string2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="string2.cpp">
@@ -68,5 +71,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="file.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="healthcare_dataset.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="t.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

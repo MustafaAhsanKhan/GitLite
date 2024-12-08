@@ -1,337 +1,420 @@
 #pragma once
+#include "String.h"
+#include <filesystem>
+#include <fstream>
 #include <iostream>
-#include <iomanip>
-#include <queue>
+#include <string>
+
 using namespace std;
+namespace fs = std::filesystem;
+
+inline String custom_to_string(int value);
 
 // An AVL tree node
 struct Node
 {
-    int key;
-    Node* left;
-    Node* right;
+    String key;
+    int isLeaf;
     int height;
+    int balanceFactor;
+    String leftFile;
+    String rightFile;
+    String dataRow; // Store the data row in a single String
 
-    Node(int k)
+    Node(const String& k, int leaf, int hgt, int balance, const String& left, const String& right, const String& data)
+        : key(k), isLeaf(leaf), height(hgt), balanceFactor(balance), leftFile(left), rightFile(right), dataRow(data) {
+    }
+    ~Node()
     {
-        key = k;
-        left = nullptr;
-        right = nullptr;
-        height = 1;
+        // Explicitly clear the String members to ensure their destructors are called
+        key.clear();
+        leftFile.clear();
+        rightFile.clear();
+        dataRow.clear();
     }
 };
 
-class AVL
-{
 
+class AVL {
 private:
-    Node* root;
+    fs::path rootFileName;
+    int nodeCount;
+    fs::path directoryPath;
+
+    void createDirectory(const String& dirName) {
+        directoryPath = fs::path(dirName.getData());
+        if (!fs::exists(directoryPath))
+        {
+            std::cout << "Created branch: " << directoryPath << std::endl;
+            fs::create_directory(directoryPath);
+        }
+    }
+
+    fs::path generateFileName(String key)
+    {
+        String fileName = to_string(nodeCount++) + ".txt";
+        return (directoryPath / fileName.getData());
+    }
+
+    // Modify insert and delete functions to work with filenames
 public:
+    AVL() : rootFileName(""), nodeCount(0) {}
 
-	AVL()
-	{
-		root = nullptr;
-	}
-
-	Node* getRoot()
-	{
-		return root;
-	}
-
-    // A utility function to get the height 
-    // of the tree
-    int height(Node* N)
-    {
-        if (N == nullptr)
-            return 0;
-        return N->height;
+    void initialize(const String& dirName) {
+        createDirectory(dirName);
     }
 
-    // A utility function to right rotate 
-    // subtree rooted with y
-    Node* rightRotate(Node* y)
-    {
-        Node* x = y->left;
-        Node* T2 = x->right;
-
-        // Perform rotation
-        x->right = y;
-        y->left = T2;
-
-        // Update heights
-        y->height = 1 + max(height(y->left),
-            height(y->right));
-        x->height = 1 + (height(x->left),
-            height(x->right));
-
-        // Return new root
-        return x;
-    }
-
-    // A utility function to left rotate 
-    // subtree rooted with x
-    Node* leftRotate(Node* x)
-    {
-        Node* y = x->right;
-        Node* T2 = y->left;
-
-        // Perform rotation
-        y->left = x;
-        x->right = T2;
-
-        // Update heights
-        x->height = 1 + max(height(x->left),
-            height(x->right));
-        y->height = 1 + max(height(y->left),
-            height(y->right));
-
-        // Return new root
-        return y;
-    }
-
-    // Get Balance factor of node N
-    int getBalance(Node* N)
-    {
-        if (N == nullptr)
-            return 0;
-        return height(N->left) -
-            height(N->right);
-    }
-
-    Node* insertHelper(Node* node, int key)
-    {
-        // 1. Perform the normal BST rotation
-        if (node == nullptr)
-            return new Node(key);
-
-        if (key < node->key)
-            node->left = insertHelper(node->left, key);
-        else if (key > node->key)
-            node->right = insertHelper(node->right, key);
-        else // Equal keys not allowed
-            return node;
-
-        // 2. Update height of this ancestor node
-        node->height = 1 + max(height(node->left),
-            height(node->right));
-
-        // 3. Get the balance factor of this 
-        // ancestor node to check whether this 
-        // node became unbalanced
-        int balance = getBalance(node);
-
-        // If this node becomes unbalanced, then 
-        // there are 4 cases
-
-        // Left Left Case
-        if (balance > 1 && key < node->left->key)
-            return rightRotate(node);
-
-        // Right Right Case
-        if (balance < -1 && key > node->right->key)
-            return leftRotate(node);
-
-        // Left Right Case
-        if (balance > 1 && key > node->left->key)
-        {
-            node->left = leftRotate(node->left);
-            return rightRotate(node);
-        }
-
-        // Right Left Case
-        if (balance < -1 && key < node->right->key)
-        {
-            node->right = rightRotate(node->right);
-            return leftRotate(node);
-        }
-
-        // return the (unchanged) node pointer
-        return node;
-    }
-
-    // Given a non-empty binary search tree, 
-    // return the node with minimum key value 
-    // found in that tree. Note that the entire 
-    // tree does not need to be searched.
-    Node* minValueNode(Node* node)
-    {
-        Node* current = node;
-
-        // loop down to find the leftmost leaf
-        while (current->left != nullptr)
-            current = current->left;
-
-        return current;
-    }
-
-    // Recursive function to delete a node with 
-    // given key from subtree with given root. 
-    // It returns root of the modified subtree.
-    Node* deleteNodeHelper(Node* root, int key)
-    {
-        // STEP 1: PERFORM STANDARD BST DELETE
-        if (root == nullptr)
-            return root;
-
-        // If the key to be deleted is smaller 
-        // than the root's key, then it lies in 
-        // left subtree
-        if (key < root->key)
-            root->left = deleteNodeHelper(root->left, key);
-
-        // If the key to be deleted is greater 
-        // than the root's key, then it lies in 
-        // right subtree
-        else if (key > root->key)
-            root->right = deleteNodeHelper(root->right, key);
-
-        // if key is same as root's key, then 
-        // this is the node to be deleted
-        else
-        {
-            // node with only one child or no child
-            if ((root->left == nullptr) ||
-                (root->right == nullptr))
-            {
-                Node* temp = root->left ?
-                    root->left : root->right;
-
-                // No child case
-                if (temp == nullptr)
-                {
-                    temp = root;
-                    root = nullptr;
-                }
-                else // One child case
-                    *root = *temp; // Copy the contents of 
-                // the non-empty child
-                free(temp);
+    void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
+        line.clear();
+        char ch;
+        while (file.get(ch)) {
+            if (ch == delimiter) {
+                break;
             }
-            else
-            {
-                // node with two children: Get the 
-                // inorder successor (smallest in 
-                // the right subtree)
-                Node* temp = minValueNode(root->right);
+            line += ch;
+        }
+        line.push_back('\0');
+    }
 
-                // Copy the inorder successor's 
-                // data to this node
-                root->key = temp->key;
-
-                // Delete the inorder successor
-                root->right = deleteNodeHelper(root->right, temp->key);
-            }
+    Node readNodeFromFile(const fs::path& filePath) {
+        std::ifstream nodeFile(filePath);
+        if (!nodeFile.is_open()) {
+            // Return a node indicating that it doesn't exist
+            return Node("", 0, -1, 0, "", "", "");
         }
 
-        // If the tree had only one node then return
-        if (root == nullptr)
-            return root;
+        String key, leftFile, rightFile, dataRow;
+        int isLeaf, height, balanceFactor;
 
-        // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
-        root->height = 1 + max(height(root->left),
-            height(root->right));
+        customGetline(nodeFile, key);
+        nodeFile >> isLeaf;
+        nodeFile >> height;
+        nodeFile >> balanceFactor;
+        nodeFile.ignore(); // Ignore the newline after balanceFactor
+        customGetline(nodeFile, leftFile);
+        customGetline(nodeFile, rightFile);
 
-        // STEP 3: GET THE BALANCE FACTOR OF THIS 
-        // NODE (to check whether this node 
-        // became unbalanced)
-        int balance = getBalance(root);
+        customGetline(nodeFile, dataRow); // Read the data row as a single string
+        dataRow += "\n";
 
-        // If this node becomes unbalanced, then 
-        // there are 4 cases
+        nodeFile.close();
 
+        return Node(key, isLeaf, height, balanceFactor, leftFile, rightFile, dataRow);
+    }
+
+
+    void writeNodeToFile(const Node& node, const fs::path& filePath) {
+        std::ofstream nodeFile(filePath);
+        nodeFile << node.key << '\n';
+        nodeFile << node.isLeaf << '\n';
+        nodeFile << node.height << '\n';
+        nodeFile << node.balanceFactor << '\n';
+        nodeFile << node.leftFile << '\n';
+        nodeFile << node.rightFile << '\n';
+        nodeFile << node.dataRow; // No extra newline here
+        nodeFile.close();
+    }
+
+
+    void insert(const String& key, const String& dataRow) {
+        rootFileName = insertHelper(rootFileName, key, dataRow);
+    }
+
+    fs::path insertHelper(const fs::path& nodeFileName, const String& key, const String& dataRow) {
+        if (nodeFileName.empty()) {
+            // Create new node with height 0
+            fs::path newNodeFile = generateFileName(key);
+            Node newNode(key, 1, 0, 0, "", "", dataRow);
+            writeNodeToFile(newNode, newNodeFile);
+            return newNodeFile;
+        }
+
+        Node node = readNodeFromFile(nodeFileName);
+
+        if (key.isGreaterThan(node.key) == 2) {  // Less
+            fs::path updatedLeftChild = insertHelper(node.leftFile.getData(), key, dataRow);
+            node.leftFile = updatedLeftChild.string();
+        }
+        else {
+            // Insert duplicates to the right subtree (greater or equal cases)
+            fs::path updatedRightChild = insertHelper(node.rightFile.getData(), key, dataRow);
+            node.rightFile = updatedRightChild.string();
+        }
+
+        node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
+
+        // **Immediately write the updated node back to file**
+        writeNodeToFile(node, nodeFileName);
+
+        // Update balance factor
+        updateBalanceFactor(nodeFileName);
+
+        // Read the node again to get updated balance factor
+        node = readNodeFromFile(nodeFileName);
+        int balance = node.balanceFactor;
+
+        // Perform rotations if necessary
         // Left Left Case
-        if (balance > 1 &&
-            getBalance(root->left) >= 0)
-            return rightRotate(root);
-
-        // Left Right Case
-        if (balance > 1 && getBalance(root->left) < 0)
-        {
-            root->left = leftRotate(root->left);
-            return rightRotate(root);
+        if (balance > 1 && key.isGreaterThan(readNodeFromFile(node.leftFile.getData()).key) == 2) {
+            return rightRotate(nodeFileName);
         }
 
         // Right Right Case
-        if (balance < -1 && getBalance(root->right) <= 0)
-            return leftRotate(root);
+        if (balance < -1 && key.isGreaterThan(readNodeFromFile(node.rightFile.getData()).key) != 2) {
+            return leftRotate(nodeFileName);
+        }
+
+        // Left Right Case
+        if (balance > 1 && key.isGreaterThan(readNodeFromFile(node.leftFile.getData()).key) != 2) {
+            node.leftFile = leftRotate(node.leftFile.getData()).string();
+            writeNodeToFile(node, nodeFileName); // Update node after rotation
+            return rightRotate(nodeFileName);
+        }
 
         // Right Left Case
-        if (balance < -1 && getBalance(root->right) > 0)
-        {
-            root->right = rightRotate(root->right);
-            return leftRotate(root);
+        if (balance < -1 && key.isGreaterThan(readNodeFromFile(node.rightFile.getData()).key) == 2) {
+            node.rightFile = rightRotate(node.rightFile.getData()).string();
+            writeNodeToFile(node, nodeFileName); // Update node after rotation
+            return leftRotate(nodeFileName);
         }
 
-        return root;
+        writeNodeToFile(node, nodeFileName);
+        return nodeFileName;
     }
 
-    // A utility function to print preorder 
-    // traversal of the tree. 
-    void InOrder(Node* root)
-    {
-        if (root != nullptr)
-        {
-            InOrder(root->left);
-            cout << root->key << " ";
-            InOrder(root->right);
-        }
-    }
-
-    void LevelOrderTraversal()
-    {
-        if (!root) {
-            cout << "Tree is empty." << endl;
-            return;
+    fs::path deleteHelper(const fs::path& nodeFileName, const String& key) {
+        if (nodeFileName.empty()) {
+            // Key not found
+            return nodeFileName;
         }
 
-        int height = root->height;
-        int maxWidth = pow(2, height) - 1; // Maximum width of the last level
-        queue<Node*> q;
-        q.push(root);
+        Node node = readNodeFromFile(nodeFileName);
 
-        for (int level = 0; level < height; ++level) {
-            int levelNodes = pow(2, level);
-            int spaceBetween = maxWidth / levelNodes;
+        // Perform standard BST deletion
+        if (key.isGreaterThan(node.key) == 2) { // Key is less
+            node.leftFile = deleteHelper(node.leftFile.getData(), key).string();
+        }
+        else if (key.isGreaterThan(node.key) == 1) { // Key is greater
+            node.rightFile = deleteHelper(node.rightFile.getData(), key).string();
+        }
+        else {
+            // Node with only one child or no child
+            if (node.leftFile.empty() || node.rightFile.empty()) {
+                fs::path tempFileName = node.leftFile.empty() ? node.rightFile.getData() : node.leftFile.getData();
 
-            // Print the level nodes
-            for (int i = 0; i < levelNodes; ++i) {
-                Node* current = q.front();
-                q.pop();
+                // Delete current node file
+                fs::remove(nodeFileName);
 
-                if (i == 0) // Print leading spaces for the first node
-                    cout << string((spaceBetween - 1) / 2, ' ');
-
-                if (current) {
-                    cout << setw(5) << current->key;
-                    q.push(current->left);
-                    q.push(current->right);
+                // If no child
+                if (tempFileName.empty()) {
+                    // No further action needed
+                    return "";
                 }
                 else {
-                    cout << "  ";
-                    q.push(nullptr); // Placeholder for left and right of null
-                    q.push(nullptr);
+                    return tempFileName; // Return the non-empty child
                 }
-
-                if (i != levelNodes - 1) // Print spaces between nodes
-                    cout << string(spaceBetween, ' ');
             }
-            cout << endl;
-            maxWidth /= 2; // Halve the max width for the next level
+            else {
+                // Node with two children: Get the inorder successor
+                fs::path tempFileName = minValueNode(node.rightFile.getData());
+                Node tempNode = readNodeFromFile(tempFileName);
+
+                // Copy the inorder successor's data to this node
+                node.key = tempNode.key;
+                node.dataRow = tempNode.dataRow;
+
+                // Delete the inorder successor
+                node.rightFile = deleteHelper(node.rightFile.getData(), tempNode.key).string();
+            }
         }
+
+        // Update `isLeaf` flag
+        node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
+
+        // Write the updated node back to the file
+        writeNodeToFile(node, nodeFileName);
+
+        // Update balance factors and heights
+        updateBalanceFactor(nodeFileName);
+        node = readNodeFromFile(nodeFileName);
+        int balance = node.balanceFactor;
+
+        // Balance the tree
+        // Left Left Case
+        if (balance > 1 && getBalanceFactor(node.leftFile.getData()) >= 0) {
+            return rightRotate(nodeFileName);
+        }
+
+        // Left Right Case
+        if (balance > 1 && getBalanceFactor(node.leftFile.getData()) < 0) {
+            node.leftFile = leftRotate(node.leftFile.getData()).string();
+            writeNodeToFile(node, nodeFileName);
+            return rightRotate(nodeFileName);
+        }
+
+        // Right Right Case
+        if (balance < -1 && getBalanceFactor(node.rightFile.getData()) <= 0) {
+            return leftRotate(nodeFileName);
+        }
+
+        // Right Left Case
+        if (balance < -1 && getBalanceFactor(node.rightFile.getData()) > 0) {
+            node.rightFile = rightRotate(node.rightFile.getData()).string();
+            writeNodeToFile(node, nodeFileName);
+            return leftRotate(nodeFileName);
+        }
+
+        return nodeFileName;
     }
 
-    void insert(int key)
-    {
-        root = insertHelper(root, key); // Update root
+    void deleteKey(const String& key) {
+        rootFileName = deleteHelper(rootFileName, key);
     }
 
-    void deleteNode(int key)
-    {
-        root = deleteNodeHelper(root, key); // Update root
+    /*void updateHeight(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return;
+
+        Node node = readNodeFromFile(nodeFileName);
+
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+        node.height = 1 + max(leftHeight, rightHeight);
+
+        writeNodeToFile(node, nodeFileName);
+    }*/
+
+    fs::path minValueNode(const fs::path& nodeFileName) {
+        fs::path currentFileName = nodeFileName;
+        Node currentNode = readNodeFromFile(currentFileName);
+
+        // Loop down to find the leftmost leaf
+        while (!currentNode.leftFile.empty()) {
+            currentFileName = currentNode.leftFile.getData();
+            currentNode = readNodeFromFile(currentFileName);
+        }
+        return currentFileName;
     }
 
-    void InOrderTraversal()
-    {
-        InOrder(root);
+
+    void updateBalanceFactor(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return;
+        Node node = readNodeFromFile(nodeFileName);
+
+        // Ensure child heights are up-to-date
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+
+        // Compute balance factor
+        node.balanceFactor = leftHeight - rightHeight;
+
+        // **Write the updated node back to the file**
+        writeNodeToFile(node, nodeFileName);
     }
+
+
+
+
+    fs::path rightRotate(const fs::path& yFileName) {
+        Node y = readNodeFromFile(yFileName);
+        fs::path xFileName = y.leftFile.getData();
+        Node x = readNodeFromFile(xFileName);
+        fs::path T2FileName = x.rightFile.getData();
+
+        // Perform rotation
+        x.rightFile = yFileName.string();
+        y.leftFile = T2FileName.string();
+
+        // Update `isLeaf` flags
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
+
+        // Write updates back to files
+        writeNodeToFile(y, yFileName);
+        writeNodeToFile(x, xFileName);
+
+        // Update heights and balance factors recursively
+        getHeight(yFileName);
+        updateBalanceFactor(yFileName);
+        getHeight(xFileName);
+        updateBalanceFactor(xFileName);
+
+        return xFileName; // New root after rotation
+    }
+
+
+
+
+    fs::path leftRotate(const fs::path& xFileName) {
+        Node x = readNodeFromFile(xFileName);
+        fs::path yFileName = x.rightFile.getData();
+        Node y = readNodeFromFile(yFileName);
+        fs::path T2FileName = y.leftFile.getData();
+
+        // Perform rotation
+        y.leftFile = xFileName.string();
+        x.rightFile = T2FileName.string();
+
+        // Update `isLeaf` flags
+        x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
+        y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
+
+        // Write updated nodes back to files
+        writeNodeToFile(x, xFileName);
+        writeNodeToFile(y, yFileName);
+
+        // Update heights and balance factors recursively
+        getHeight(xFileName);
+        updateBalanceFactor(xFileName);
+        getHeight(yFileName);
+        updateBalanceFactor(yFileName);
+
+        return yFileName; // New root after rotation
+    }
+
+
+
+
+    int getHeight(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) {
+            return -1; // Height of a non-existent node is -1
+        }
+
+        Node node = readNodeFromFile(nodeFileName);
+
+        // Recursively get heights of left and right children
+        int leftHeight = getHeight(node.leftFile.getData());
+        int rightHeight = getHeight(node.rightFile.getData());
+
+        // Compute current node's height
+        node.height = 1 + std::max(leftHeight, rightHeight);
+
+        // Write the updated node back to the file
+        writeNodeToFile(node, nodeFileName);
+
+        return node.height;
+    }
+
+
+
+    int getBalanceFactor(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return 0;
+        Node node = readNodeFromFile(nodeFileName);
+        return getHeight(node.leftFile.getData()) - getHeight(node.rightFile.getData());
+    }
+
+    void inOrderTraversal(const fs::path& nodeFileName) {
+        if (nodeFileName.empty()) return;
+
+        Node node = readNodeFromFile(nodeFileName);
+        inOrderTraversal(node.leftFile.getData());
+        std::cout << "Key: " << node.key << ", Height: " << node.height << ", Balance Factor: " << node.balanceFactor << std::endl;
+        inOrderTraversal(node.rightFile.getData());
+    }
+
+    void inOrder() {
+        inOrderTraversal(rootFileName);
+    }
+
+
 };
+
