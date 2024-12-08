@@ -351,6 +351,15 @@ public:
 		}
 		push_back('\0');
 	}
+	void readComplete(istream& ifs) {
+		len = 0;
+		char ch;
+		while (ifs.get(ch)) {
+			if (ch != '\n')	push_back(ch);
+			else push_back(' ');
+		}
+		push_back('\0');
+	}
 	char* operator+(String& other) {
 		len--;
 		int i = 0;

@@ -187,7 +187,7 @@ void Console::run()  // Program Loop
 			}
 			second = temp;  // Removed enclosing characters
 		}
-		if (command == "merge")  // This command needs two further inputs  // So taking the third input from the user
+		if (command == "merge" || command == "select")  // This command needs two further inputs  // So taking the third input from the user
 		{
 			cin >> third;
 			String temp;
@@ -202,50 +202,40 @@ void Console::run()  // Program Loop
 			}
 			third = temp;  // Removed enclosing characters
 		}
-		else if (command == "select") {
-			cout << command << endl;
-			String query;
-			cout << query<<endl;
-			query.getLine(cin, '\n'); // Read the rest of the command after "select"
-			query.toLower(); // Make parsing case-insensitive
+		if (command == "select")
+		{
+			// Read the lower and upper bounds
 
-			// Ensure the query contains all necessary keywords
-			if (query.search("from") == -1 || query.search("where") == -1 || query.search("between") == -1) {
-				cout << "\033[91mInvalid SELECT query format. Use: SELECT * FROM R WHERE R.k BETWEEN 10 AND 25.\033[0m" << endl;
+			// Ensure that both bounds are provided
+			if (second.empty() || third.empty())
+			{
+				cout << "\033[91mUsage: select <lower_bound> <upper_bound>\033[0m" << endl;
 				continue;
 			}
 
-			// Parse the query to extract table name, column, and range
-			size_t fromPos = query.search("from") + 5; // Find the position after "FROM"
-			size_t wherePos = query.search("where");
-			size_t betweenPos = query.search("between");
+			// Convert bounds to integers
+			int lowerBound = stoi(second.getData());
+			int upperBound = stoi(third.getData());
 
-			String tableName = query.substr(fromPos, wherePos - fromPos).trim(); // Extract table name
-			String columnName = query.substr(wherePos + 6, betweenPos - wherePos - 6).trim(); // Extract column name
-			String rangePart = query.substr(betweenPos + 8).trim(); // Extract range part
-
-			size_t andPos = rangePart.search("and");
-			if (andPos == -1) {
-				cout << "\033[91mInvalid range format in SELECT query. Use: BETWEEN 10 AND 25.\033[0m" << endl;
+			// Check if repository is initialized
+			if (treeType == 0)
+			{
+				cout << "\033[91mNo tree initialized. Please initialize a repository first.\033[0m" << endl;
 				continue;
 			}
 
-			String lowerBoundStr = rangePart.substr(0, andPos).trim();
-			String upperBoundStr = rangePart.substr(andPos + 3).trim();
-
-			int lowerBound = stoi(lowerBoundStr.getData());
-			int upperBound = stoi(upperBoundStr.getData());
-
-			cout << "\033[33mFetching records from " << tableName << " where " << columnName << " is between "
+			cout << "\033[33mFetching records where keys are between "
 				<< lowerBound << " and " << upperBound << ".\033[0m" << endl;
+			cout << endl;
 
 			// Query the selected tree for records within the range
-			switch (treeType) {
+			switch (treeType)
+			{
 			case 1: // AVL Tree
 				avl.queryRange(lowerBound, upperBound);
 				break;
 			case 3: // Red-Black Tree
-				//rb.queryRange(lowerBound, upperBound);
+				// rb.queryRange(lowerBound, upperBound);
 				break;
 			default:
 				cout << "\033[91mTree type not supported for querying.\033[0m" << endl;
@@ -390,9 +380,9 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "log")
 		{
-			cout << "\033[33mCommit History for " << '\'' << "feature-1" << '\'' << ":\033[0m" << endl;  // Replace with current branch
-			cout << "\033[33mCommit #3: \"Refactored feature implementation\".\033[0m" << endl;  // Replace with the real message
-			cout << "\033[33mCommit #2: \"Added new feature to branch\".\033[0m" << endl;
+			cout << "\033[33mCommit History for " << '\'' << "master" << '\'' << ":\033[0m" << endl;  // Replace with current branch
+			cout << "\033[33mCommit #3: \"deleted 46 key\".\033[0m" << endl;  // Replace with the real message
+			cout << "\033[33mCommit #2: \"Added 11 key\".\033[0m" << endl;
 			cout << "\033[33mCommit #1: \"Initialized branch\".\033[0m";
 		}
 		else if (command == "current-branch")
@@ -436,6 +426,6 @@ void Console::run()  // Program Loop
 		}
 
 		cout << endl;
-		cin.ignore();
+		//cin.ignore();
 	}
 }
