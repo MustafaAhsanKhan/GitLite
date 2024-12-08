@@ -18,19 +18,7 @@
     <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BTree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BTreeNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AVL-Tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="string2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RB-Tree.h">
@@ -42,7 +30,7 @@
     <ClInclude Include="merkleTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="picosha2.h">
+    <ClInclude Include="String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,20 +41,14 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="string2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="string2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BTreeFileSystem.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="String.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

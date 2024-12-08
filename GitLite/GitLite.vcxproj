@@ -132,20 +132,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AVL-Tree.h" />
-    <ClInclude Include="BTree.h" />
-    <ClInclude Include="BTreeNode.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="merkleTree.h" />
-    <ClInclude Include="Parser.h" />
     <ClInclude Include="RB-Tree.h" />
     <ClInclude Include="String.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BTree.cpp" />
     <ClCompile Include="BTreeFileSystem.h" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="String.cpp" />
   </ItemGroup>
   <ItemGroup>

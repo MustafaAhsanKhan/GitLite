@@ -3,7 +3,6 @@
 #include "RB-Tree.h"
 #include "BTreeFileSystem.h"
 #include "String.h"
-//#include "merkleTree.h"
 #include <filesystem>
 using namespace filesystem;
 class Console

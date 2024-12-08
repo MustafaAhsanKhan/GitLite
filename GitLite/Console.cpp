@@ -351,7 +351,6 @@ void Console::run()  // Program Loop
 		}
 		else if (command == "merge")
 		{
-
 			// second stores the source branch
 			// third stores the target branch
 			cout << "\033[33mMerged " << '\'' << second << '\'' << " into " << '\'' << third << '\'' << " successfully.\033[0m";
