@@ -262,7 +262,7 @@ void Console::run()  // Program Loop
 		{
 
 			create_directory(repoFolder / second.getData());
-			copy(currentBranchFolder, repoFolder / second.getData());
+			copy(currentBranchFolder, repoFolder / second.getData(), fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 			currentBranchFolder = repoFolder / second.getData();
 			ofstream file(repoFolder / "repo_data.txt");
 			file << treeType << endl << second;
@@ -380,7 +380,6 @@ void Console::run()  // Program Loop
 				cout << "\033[91mAlready in a repository. Close this repo first.\033[0m";
 			}
 
-			cout << "\033[33mRepository loaded successfully from '" << second << "'.\033[0m";
 		}
 		else
 		{
