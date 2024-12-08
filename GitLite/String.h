@@ -20,6 +20,30 @@ public:
 		max = 250;
 		data = new T[max]();
 	}
+	virtual ~Vector() {
+		delete[] data;
+	}
+	Vector(const Vector<T>& other) {
+		len = other.len;
+		max = other.max;
+		data = new T[max];
+		for (int i = 0; i < len; ++i) {
+			data[i] = other.data[i];
+		}
+	}
+	Vector<T>& operator=(const Vector<T>& other) {
+		if (this != &other) {
+			delete[] data; // Free existing data
+
+			len = other.len;
+			max = other.max;
+			data = new T[max];
+			for (int i = 0; i < len; ++i) {
+				data[i] = other.data[i];
+			}
+		}
+		return *this;
+	}
 	T* getData() const {
 		return data;
 	}

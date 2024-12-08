@@ -24,6 +24,14 @@ struct Node
     Node(const String& k, int leaf, int hgt, int balance, const String& left, const String& right, const String& data)
         : key(k), isLeaf(leaf), height(hgt), balanceFactor(balance), leftFile(left), rightFile(right), dataRow(data) {
     }
+    ~Node()
+    {
+        // Explicitly clear the String members to ensure their destructors are called
+        key.clear();
+        leftFile.clear();
+        rightFile.clear();
+        dataRow.clear();
+    }
 };
 
 
