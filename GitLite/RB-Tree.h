@@ -1,5 +1,5 @@
 #pragma once
-#include "string2.h"
+#include "String.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -9,7 +9,7 @@ using namespace std;
 namespace fs = std::filesystem;
 
 // Custom to_string function for String class
-String custom_to_string(int value) {
+inline String custom_to_string(int value) {
     String result;
     bool isNegative = false;
 

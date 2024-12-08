@@ -8,7 +8,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-String custom_to_string(int value);
+inline String custom_to_string(int value);
 
 // An AVL tree node
 struct Node

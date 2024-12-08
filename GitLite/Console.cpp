@@ -1,7 +1,168 @@
 #include "Console.h"
-#include <iomanip>
+
 Console::Console()
 {
+	command = "";
+	second = "";
+	third = "";
+	selectedTree = 0;
+}
+
+bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
+	line.clear();
+	char ch;
+	while (file.get(ch)) {
+		if (ch == delimiter) {
+			return true; // Successfully read a line
+		}
+		line += ch;
+	}
+	return !line.empty(); // Return true if there was any content read before EOF
+}
+
+void Console::parseCsv(int selectedTree, String second)
+{
+	String csvFileName = second;  // csv file
+
+	String directoryName = "master";
+
+	// Create the tree using a switch based on the selected tree
+	switch (selectedTree)
+	{
+		case(1):
+		{
+			avl.initialize(directoryName);
+			break;
+		}
+		case(2):
+		{
+			//Btree.initialize(directoryName);
+			break;
+		}
+		case(3):
+		{
+			rb.initialize(directoryName);
+			break;
+		}
+	}
+
+
+	ifstream csvFile(csvFileName.getData());
+	if (!csvFile.is_open()) {
+		cout << "Unable to open the CSV file." << endl;
+		return;
+	}
+
+	// Read the header line to get column names
+	String headerLine;
+	customGetline(csvFile, headerLine);
+	string headerLineStr;
+	vector<String> headers;
+	String header;
+	int pos = 0;
+	for (int i = 0; headerLine[i] != '\0'; i++) {
+		if (headerLine[i] == ',') {
+			headers.push_back(header);
+			header.clear();
+		}
+		else {
+			header += headerLine[i];
+		}
+		pos = i;
+	}
+	// Add the last header after the loop
+	header += headerLine[pos + 1];
+	headers.push_back(header);
+
+	// Display available columns
+	cout << "Available columns:" << endl;
+	for (size_t i = 0; i < headers.size(); ++i) {
+		cout << i + 1 << ": " << headers[i].getData() << endl;
+	}
+
+	int columnChoice;
+	cout << "Select a column number to use as the key: ";
+	cin.ignore(); // Ignore the newline character left by previous input
+	cin >> columnChoice;
+	--columnChoice; // Adjust for zero-based index
+
+	if (columnChoice < 0 || columnChoice >= headers.size()) {
+		cout << "Invalid column choice." << endl;
+		return;
+	}
+
+	// Read and process each row
+	String line;
+	while (customGetline(csvFile, line)) {
+		vector<String> rowData;
+		String cell;
+		for (int i = 0; line[i] != '\0'; ++i) {
+			if (line[i] == ',') {
+				rowData.push_back(cell);
+				cell.clear();
+			}
+			else {
+				cell += line[i];
+			}
+		}
+		// Add the last cell after the loop
+		rowData.push_back(cell);
+
+		if (columnChoice < rowData.size()) {
+			String key = rowData[columnChoice];
+			// Reconstruct the data row as a single string
+			String dataRow;
+			for (size_t i = 0; i < rowData.size(); ++i) {
+				dataRow += rowData[i];
+				if (i != rowData.size() - 1) {
+					dataRow += ',';
+				}
+			}
+			switch (selectedTree)
+			{
+				case(1):
+				{
+					avl.insert(key, dataRow);
+					break;
+				}
+				case(2):
+				{
+					//bt.insert(key, dataRow);
+					break;
+				}
+				case(3):
+				{
+					rb.insert(key, dataRow);
+					break;
+				}
+			}
+		}
+		else
+		{
+			cout << "Row has fewer columns than expected." << endl;
+		}
+	}
+
+	csvFile.close();
+
+	switch (selectedTree)
+	{
+		case(1):
+		{
+			avl.inOrder();
+			break;
+		}
+		case(2):
+		{
+			//Btree.initialize(directoryName);
+			break;
+		}
+		case(3):
+		{
+			//rb.inorder();
+			break;
+		}
+	}
 }
 
 void Console::run()  // Program Loop
@@ -71,20 +232,25 @@ void Console::run()  // Program Loop
 				cin >> x;
 				if (x == 1)
 				{
+					selectedTree = 1;
 					cout << "\033[33mSelected AVL tree.\033[0m";
 					break;
 				}
 				else if (x == 2)
 				{
+					selectedTree = 2;
 					cout << "\033[33mSelected B-Tree.\033[0m";
 					break;
 				}
 				else if (x == 3)
 				{
+					selectedTree = 3;
 					cout << "\033[33mSelected Red-Black Tree.\033[0m";
 					break;
 				}
 			}
+			cout << endl;
+			parseCsv(selectedTree, second);
 		}
 		else if (command == "branch")
 		{
