@@ -399,7 +399,8 @@ private:
 public:
     RBTree() : rootFileName(""), nodeCount(0) {}
 
-    void initialize( fs::path dirName) {
+    void initialize( fs::path dirName)
+    {
         //createDirectory(dirName);
         directoryPath = dirName;
     }
