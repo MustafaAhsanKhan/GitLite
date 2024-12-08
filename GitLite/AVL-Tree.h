@@ -1,5 +1,5 @@
 #pragma once
-#include "string2.h"
+#include "String.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -42,8 +42,7 @@ private:
 
     fs::path generateFileName(String key)
     {
-        String temp = "";
-        String fileName = temp + to_string(nodeCount++) + ".txt";
+        String fileName = to_string(nodeCount++) + ".txt";
         return (directoryPath / fileName.getData());
     }
 

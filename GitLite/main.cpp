@@ -1,6 +1,7 @@
-#include "string2.h"
+#include "String.h"
 #include "AVL-Tree.h"
 #include "RB-Tree.h"
+#include "Console.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,8 +23,11 @@ bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
     return !line.empty(); // Return true if there was any content read before EOF
 }
 
-int main() {
-    RBTree tree;
+int main()
+{
+    Console C1;
+	C1.run();
+    AVL tree;
     String csvFileName;
     cout << "Enter the CSV file name (with extension): ";
     cin >> csvFileName;
