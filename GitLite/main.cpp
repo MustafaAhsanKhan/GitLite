@@ -21,7 +21,7 @@ int main()
 {
 	//MerkleTree tree(1);
 	//tree.generateFromFolder("tree");
-	MerkleTree::getChangedFiles("merkle\\14.txt", "merkle2\\14.txt");
+	//MerkleTree::getChangedFiles("merkle\\14.txt", "merkle2\\14.txt");
 
 	//BTree<int, 4> tree("tree");
 	//for (int i = 0; i < 10000; i++) {
@@ -55,8 +55,8 @@ int main()
 		//cout << "-----------------";
 	//}
 
-	//Console C1;
-	//C1.run();  // Program Loop
+	Console C1;
+	C1.run();  // Program Loop
 	//AVL tree;
 
 	//// Constructing tree given in the 

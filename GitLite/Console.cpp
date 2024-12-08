@@ -16,6 +16,10 @@ void Console::run()  // Program Loop
 		// The command and second strings allow us to split these into two
 		// Further allowing us to use them where needed
 		cout << '>';  // Ready for user input
+		//cin.ignore(); 
+		command.clear();
+		second.clear();
+		third.clear();
 		cin >> command;
 		command.toLower();  // Convert to lowercase to make everything consistent
 
@@ -150,5 +154,6 @@ void Console::run()  // Program Loop
 		}
 
 		cout << endl;
+		cin.ignore();
 	}
 }
