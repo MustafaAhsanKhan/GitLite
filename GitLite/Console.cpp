@@ -7,7 +7,7 @@ Console::Console()
 	command = "";
 	second = "";
 	third = "";
-	selectedTree = 0;
+	treeType = 0;
 }
 
 bool customGetline(std::ifstream& file, String& line, char delimiter = '\n') {
@@ -160,7 +160,6 @@ void Console::run()  // Program Loop
 		// The command and second strings allow us to split these into two
 		// Further allowing us to use them where needed
 		cout << '>';  // Ready for user input
-		//cin.ignore(); 
 		command.clear();
 		second.clear();
 		third.clear();
@@ -212,6 +211,11 @@ void Console::run()  // Program Loop
 
 
 			repoFolder = current_path() / folderName.getData();
+			if (exists(repoFolder))
+			{
+				cout << "\033[91mRepository already exists. Please load the repository.\033[0m";
+				continue;
+			}
 			create_directory(repoFolder);
 			// Create the repo using the filename provided
 			cout << "\033[33mWhich tree would you like to use?\033[0m" << endl;
@@ -223,31 +227,30 @@ void Console::run()  // Program Loop
 			while (1)
 			{
 				cin >> x;
-				treeType = x;
 				if (x == 1)
 				{
-					selectedTree = 1;
+					treeType = 1;
 					cout << "\033[33mSelected AVL tree.\033[0m";
 					file << x << endl;
 					break;
 				}
 				else if (x == 2)
 				{
-					selectedTree = 2;
+					treeType = 2;
 					cout << "\033[33mSelected B-Tree.\033[0m";
 					file << x << endl;
 					break;
 				}
 				else if (x == 3)
 				{
-					selectedTree = 3;
+					treeType = 3;
 					cout << "\033[33mSelected Red-Black Tree.\033[0m";
 					file << x << endl;
 					break;
 				}
 			}
 			cout << endl;
-			parseCsv(selectedTree, second);
+			parseCsv(treeType, second);
 			file << "master";
 			create_directory(repoFolder / "master");
 			currentBranchFolder = repoFolder / "master";
@@ -316,7 +319,7 @@ void Console::run()  // Program Loop
 			// second stores the branch the visualize
 			// Call the respective display functions
 
-			switch (selectedTree)
+			switch (treeType)
 			{
 				case(1):
 				{

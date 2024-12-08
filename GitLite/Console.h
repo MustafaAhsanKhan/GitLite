@@ -1,7 +1,8 @@
 #pragma once
 #include "AVL-Tree.h"
 #include "RB-Tree.h"
-#include "../GitLite/string2.h"
+#include "BTreeFileSystem.h"
+#include "String.h"
 
 #include <filesystem>
 using namespace filesystem;
@@ -11,15 +12,14 @@ private:
 	String command;  // First Part
 	String second;  // Second Part
 	String third;  // Third Part
-	int selectedTree;  // 1 for AVL, 2 for B-Tree, 3 for Red-Black Tree
-	String third;
+	int treeType;  // 1 for AVL, 2 for B-Tree, 3 for Red-Black Tree
 	path repoFolder = "";
 	path currentBranchFolder = "";
-	int treeType ;
 
 public:
 	AVL avl;
 	RBTree rb;
+	//BTree<int, 3> bt;
 	void parseCsv(int selectedTree, String second);
 	Console();
 	void run();

@@ -162,6 +162,14 @@ public:
 		}
 		push_back('\0');
 	}
+	void readTill(String& other, char delimeter) {
+		len = 0;
+		int i = 0;
+		while (other[i++] && other[i - 1] != delimeter) {
+			push_back(other[i - 1]);
+		}
+		push_back('\0');
+	}
 	//void operator=(string text) {
 	//	len = 0;
 	//	int i = 0;
