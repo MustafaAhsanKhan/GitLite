@@ -2,16 +2,16 @@
 #include<iostream>
 using namespace std;
 template<typename T>
-struct Node {
+struct QNode {
 	T data;
-	Node<T>* next;
+	QNode<T>* next;
 };
 
 template<typename T>
 class Queue {
 private:
-	Node<T>* front;
-	Node<T>* rear;
+	QNode<T>* front;
+	QNode<T>* rear;
 	int len = 0;
 public:
 	Queue() {
@@ -19,7 +19,7 @@ public:
 		rear = nullptr;
 	}
 	void push(T item) {
-		Node<T>* newNode = new Node<T>;
+		QNode<T>* newNode = new QNode<T>;
 		newNode->data = item;
 		newNode->next = nullptr;
 		if (rear == nullptr) {
@@ -36,7 +36,7 @@ public:
 		if (front == nullptr) {
 			return T(-1);
 		}
-		Node<T>* temp = front;
+		QNode<T>* temp = front;
 		front = front->next;
 		if (front == nullptr) {
 			rear = nullptr;
@@ -59,7 +59,7 @@ public:
 		return front->data;
 	}
 	//void print() {
-	//	Node<T>* temp = front;
+	//	QNode<T>* temp = front;
 	//	while (temp != nullptr) {
 	//		std::cout << temp->data << " ";
 	//		temp = temp->next;

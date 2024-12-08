@@ -4,7 +4,7 @@
 #include "picosha2.h"
 #include "Vector"
 #include<filesystem>
-#include "queue.h"
+#include "Queue.h"
 using namespace filesystem;
 void instructorsHash(path in, path out) {
 	char ch;
@@ -61,7 +61,7 @@ struct MerkleNode {
 		left = right = nullptr;
 	}
 	MerkleNode(MerkleNode* left, MerkleNode* right) {
-		this->hash = picosha2::hash256_hex_string(left->hash + right->hash);
+		this->hash = picosha2::hash256_hex_string((left->hash + right->hash).getData());
 		this->hashPref = left->hashPref;
 		this->left = left;
 		this->right = right;
@@ -139,8 +139,9 @@ public:
 	MerkleTree(int hpref) {
 		this->hpref = hpref;
 	}
-	void generateFromFolder(path folderPath) {
-		path fol = "merkle";
+	void generateFromFolder(path folderPath, path output) {
+		path fol = output/"merkle";
+		create_directory(fol);
 		if (!exists(folderPath)) return;
 		for (const auto& file : directory_iterator(folderPath)) {
 			if (!is_directory(file)) {
@@ -164,7 +165,12 @@ public:
 			node->writeNode();
 			currentNodeIndex++;
 		}
+
 		root = nodes.p();
+		ofstream file(output / "merkleRootAddr.txt");
+		file << root->nodePath;
+		file.close();
+
 	}
 	static Vector<Vector<path>> getChangedFiles(path branch1, path branch2) {
 		Vector<Vector<path>> changedFiles;

@@ -211,15 +211,15 @@ public:
 		return *this;
 	}
 
-	//String operator+(string val) {
-	//	len--;
-	//	int i = 0;
-	//	while (val[i++]) {
-	//		push_back(val[i - 1]);
-	//	}
-	//	push_back('\0');
-	//	return *this;
-	//}
+	String operator+(string val) {
+		len--;
+		int i = 0;
+		while (val[i++]) {
+			push_back(val[i - 1]);
+		}
+		push_back('\0');
+		return *this;
+	}
 	String substr(size_t start, size_t n = std::string::npos) const  {
 		String result;
 
@@ -351,7 +351,7 @@ public:
 		}
 		push_back('\0');
 	}
-	char* operator+(String& other) {
+	/*char* operator+(String& other) {
 		len--;
 		int i = 0;
 		while (other[i++]) {
@@ -359,7 +359,7 @@ public:
 		}
 		push_back('\0');
 		return getData();
-	}
+	}*/
 
 	bool empty()
 	{

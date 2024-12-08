@@ -1,6 +1,7 @@
 #include "Console.h"
 #include <iostream>
 #include <fstream>
+#include "merkleTree.h"
 using namespace std;
 Console::Console()
 {
@@ -303,7 +304,10 @@ void Console::run()  // Program Loop
 			currentBranchFolder = repoFolder / "master";
 			create_directory(currentBranchFolder / "tree");
 			parseCsv(treeType, second, currentBranchFolder/"tree");
-
+			if (treeType == 1 || treeType == 3) {
+				MerkleTree mt(1);
+				mt.generateFromFolder(currentBranchFolder / "tree", currentBranchFolder);
+			}
 			file.close();
 		}
 		else if (command == "branch")

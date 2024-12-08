@@ -61,15 +61,20 @@ private:
 public:
     AVL() : rootFileName(""), nodeCount(0) {}
 
-    void initialize(fs::path dirPath) {
+    void initialize(fs::path dirPath)
+    {
         directoryPath = dirPath;
-    void queryRange(int lowerBound, int upperBound) {
+    }
+    void queryRange(int lowerBound, int upperBound)
+    {
         cout << "\033[33mAVL Tree: Records within range [" << lowerBound << ", " << upperBound << "]:\033[0m" << endl;
         queryRangeHelper(rootFileName, lowerBound, upperBound);
     }
 
-    void queryRangeHelper(const fs::path& nodeFileName, int lowerBound, int upperBound) {
-        if (nodeFileName.empty()) return;
+    void queryRangeHelper(const fs::path& nodeFileName, int lowerBound, int upperBound)
+    {
+        if (nodeFileName.empty())
+            return;
 
         // Read the node from file
         Node node = readNodeFromFile(nodeFileName);
@@ -78,20 +83,24 @@ public:
         int key = stoi(node.key.getData());
 
         // Perform in-order traversal
-        if (key > lowerBound) {
+        // Left subtree
+        if (key > lowerBound)
+        {
             queryRangeHelper(node.leftFile.getData(), lowerBound, upperBound);
         }
 
-        // Print the node if it is within the range
-        if (key >= lowerBound && key <= upperBound) {
+        // Current node
+        if (key >= lowerBound && key <= upperBound)
+        {
             cout << "Key: " << node.key << ", Data: " << node.dataRow << endl;
         }
 
-        if (key < upperBound) {
+        // Right subtree
+        if (key < upperBound)
+        {
             queryRangeHelper(node.rightFile.getData(), lowerBound, upperBound);
         }
     }
-
 
 
     void initialize(const String& dirName) {
@@ -177,7 +186,7 @@ public:
 
         node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
 
-        // **Immediately write the updated node back to file**
+        // *Immediately write the updated node back to file*
         writeNodeToFile(node, nodeFileName);
 
         // Update balance factor
@@ -262,7 +271,7 @@ public:
             }
         }
 
-        // Update `isLeaf` flag
+        // Update isLeaf flag
         node.isLeaf = (node.leftFile.empty() && node.rightFile.empty()) ? 1 : 0;
 
         // Write the updated node back to the file
@@ -341,7 +350,7 @@ public:
         // Compute balance factor
         node.balanceFactor = leftHeight - rightHeight;
 
-        // **Write the updated node back to the file**
+        // *Write the updated node back to the file*
         writeNodeToFile(node, nodeFileName);
     }
 
@@ -358,7 +367,7 @@ public:
         x.rightFile = yFileName.string();
         y.leftFile = T2FileName.string();
 
-        // Update `isLeaf` flags
+        // Update isLeaf flags
         y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
         x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
 
@@ -388,7 +397,7 @@ public:
         y.leftFile = xFileName.string();
         x.rightFile = T2FileName.string();
 
-        // Update `isLeaf` flags
+        // Update isLeaf flags
         x.isLeaf = (x.leftFile.empty() && x.rightFile.empty()) ? 1 : 0;
         y.isLeaf = (y.leftFile.empty() && y.rightFile.empty()) ? 1 : 0;
 
@@ -451,4 +460,3 @@ public:
 
 
 };
-
