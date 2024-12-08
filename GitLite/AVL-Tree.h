@@ -63,6 +63,39 @@ public:
 
     void initialize(fs::path dirPath) {
         directoryPath = dirPath;
+    void queryRange(int lowerBound, int upperBound) {
+        cout << "\033[33mAVL Tree: Records within range [" << lowerBound << ", " << upperBound << "]:\033[0m" << endl;
+        queryRangeHelper(rootFileName, lowerBound, upperBound);
+    }
+
+    void queryRangeHelper(const fs::path& nodeFileName, int lowerBound, int upperBound) {
+        if (nodeFileName.empty()) return;
+
+        // Read the node from file
+        Node node = readNodeFromFile(nodeFileName);
+
+        // Convert the node's key to an integer for comparison
+        int key = stoi(node.key.getData());
+
+        // Perform in-order traversal
+        if (key > lowerBound) {
+            queryRangeHelper(node.leftFile.getData(), lowerBound, upperBound);
+        }
+
+        // Print the node if it is within the range
+        if (key >= lowerBound && key <= upperBound) {
+            cout << "Key: " << node.key << ", Data: " << node.dataRow << endl;
+        }
+
+        if (key < upperBound) {
+            queryRangeHelper(node.rightFile.getData(), lowerBound, upperBound);
+        }
+    }
+
+
+
+    void initialize(const String& dirName) {
+        createDirectory(dirName);
     }
 
     void customGetline(std::ifstream& file, String& line, char delimiter = '\n') {

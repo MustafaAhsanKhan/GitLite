@@ -220,6 +220,47 @@ public:
 	//	push_back('\0');
 	//	return *this;
 	//}
+	String substr(size_t start, size_t n = std::string::npos) const  {
+		String result;
+
+		// Ensure the start index is within bounds
+		if (start >= len - 1) { // `len - 1` because `len` includes the null terminator
+			return result; // Return an empty String
+		}
+
+		// Calculate the actual length to copy
+		size_t copyLength = (n == std::string::npos) ? (len - 1 - start) : std::min(n, len - 1 - start);
+
+		// Copy the characters to the result
+		for (size_t i = 0; i < copyLength; ++i) {
+			result.push_back(data[start + i]);
+		}
+
+		return result;
+	}
+	String trim() const {
+		size_t start = 0;
+		size_t end = len - 2; // `len - 2` because `len` includes the null terminator
+
+		// Find the first non-whitespace character
+		while (start <= end && (data[start] == ' ' || data[start] == '\t' || data[start] == '\n')) {
+			start++;
+		}
+
+		// Find the last non-whitespace character
+		while (end >= start && (data[end] == ' ' || data[end] == '\t' || data[end] == '\n')) {
+			end--;
+		}
+
+		// Create the trimmed string
+		String result;
+		for (size_t i = start; i <= end; ++i) {
+			result.push_back(data[i]);
+		}
+
+		return result;
+	}
+
 
 	void toLower() {
 		for (int i = 0; i < len; i++) {
@@ -287,6 +328,13 @@ public:
 		return !(*this == text);
 	}
 
+	void getLine(istream& is, char delimiter) {
+		char ch;
+		while (is.get(ch) && ch != delimiter) {
+			push_back(ch);
+		}
+		push_back('\0');
+	}
 	void getLine(ifstream& is, char delimiter) {
 		char ch;
 		while (is.get(ch) && ch != delimiter) {
@@ -294,7 +342,6 @@ public:
 		}
 		push_back('\0');
 	}
-
 	void readComplete(ifstream& ifs) {
 		len = 0;
 		char ch;

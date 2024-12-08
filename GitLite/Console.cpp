@@ -202,7 +202,55 @@ void Console::run()  // Program Loop
 			}
 			third = temp;  // Removed enclosing characters
 		}
+		else if (command == "select") {
+			cout << command << endl;
+			String query;
+			cout << query<<endl;
+			query.getLine(cin, '\n'); // Read the rest of the command after "select"
+			query.toLower(); // Make parsing case-insensitive
 
+			// Ensure the query contains all necessary keywords
+			if (query.search("from") == -1 || query.search("where") == -1 || query.search("between") == -1) {
+				cout << "\033[91mInvalid SELECT query format. Use: SELECT * FROM R WHERE R.k BETWEEN 10 AND 25.\033[0m" << endl;
+				continue;
+			}
+
+			// Parse the query to extract table name, column, and range
+			size_t fromPos = query.search("from") + 5; // Find the position after "FROM"
+			size_t wherePos = query.search("where");
+			size_t betweenPos = query.search("between");
+
+			String tableName = query.substr(fromPos, wherePos - fromPos).trim(); // Extract table name
+			String columnName = query.substr(wherePos + 6, betweenPos - wherePos - 6).trim(); // Extract column name
+			String rangePart = query.substr(betweenPos + 8).trim(); // Extract range part
+
+			size_t andPos = rangePart.search("and");
+			if (andPos == -1) {
+				cout << "\033[91mInvalid range format in SELECT query. Use: BETWEEN 10 AND 25.\033[0m" << endl;
+				continue;
+			}
+
+			String lowerBoundStr = rangePart.substr(0, andPos).trim();
+			String upperBoundStr = rangePart.substr(andPos + 3).trim();
+
+			int lowerBound = stoi(lowerBoundStr.getData());
+			int upperBound = stoi(upperBoundStr.getData());
+
+			cout << "\033[33mFetching records from " << tableName << " where " << columnName << " is between "
+				<< lowerBound << " and " << upperBound << ".\033[0m" << endl;
+
+			// Query the selected tree for records within the range
+			switch (treeType) {
+			case 1: // AVL Tree
+				avl.queryRange(lowerBound, upperBound);
+				break;
+			case 3: // Red-Black Tree
+				//rb.queryRange(lowerBound, upperBound);
+				break;
+			default:
+				cout << "\033[91mTree type not supported for querying.\033[0m" << endl;
+			}
+		}
 		// All inputs
 		if (command == "init")
 		{
